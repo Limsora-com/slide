@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Interactive presentation deck: Cleanrooms, GMP qualification, gowning, contamination control, HVAC, environmental monitoring, deviations, QA/QC and regulatory requirements.">
+<title>Pharmaceutical Cleanroom &amp; GMP — Interactive Presentation</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+:root{
+  --bg-0:#050a14;
+  --bg-1:#0a1425;
+  --bg-2:#0f1e38;
+  --ink:#e9f3ff;
+  --muted:#9cb4d4;
+  --dim:#6f8aab;
+  --line:rgba(120,180,255,.16);
+  --line-soft:rgba(120,180,255,.09);
+  --glass:rgba(11,22,42,.72);
+  --accent:#00d4ff;
+  --good:#00ff9d;
+  --warn:#ffb347;
+  --bad:#ff5c7a;
+  --radius:18px;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  font-family:'Poppins','Segoe UI',system-ui,-apple-system,sans-serif;
+  color:var(--ink);
+  background:
+    radial-gradient(1200px 800px at 12% -10%, rgba(0,212,255,.10), transparent 60%),
+    radial-gradient(1000px 700px at 100% 0%, rgba(0,255,157,.08), transparent 55%),
+    radial-gradient(900px 700px at 50% 120%, rgba(120,90,255,.10), transparent 60%),
+    linear-gradient(160deg,var(--bg-0),var(--bg-1) 45%,var(--bg-2));
+  background-attachment:fixed;
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.35;
+  background-image:linear-gradient(rgba(120,180,255,.055) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(120,180,255,.055) 1px,transparent 1px);
+  background-size:56px 56px;
+  mask-image:radial-gradient(circle at 50% 40%,#000 20%,transparent 85%);
+}
+.particles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.particle{position:absolute;background:rgba(110,205,255,.45);border-radius:50%;animation:float linear infinite}
+@keyframes float{
+  0%{transform:translateY(102vh) rotate(0deg);opacity:0}
+  12%{opacity:.85}
+  88%{opacity:.85}
+  100%{transform:translateY(-8vh) rotate(540deg);opacity:0}
+}
+::selection{background:rgba(0,212,255,.3)}
+
+/* ============================ SHARED ============================ */
+.app{position:relative;z-index:1;height:100%}
+.view{display:none;height:100%}
+.view.on{display:flex}
+.scroll-y{overflow-y:auto;overflow-x:hidden;scrollbar-width:thin;scrollbar-color:rgba(120,180,255,.35) transparent}
+.scroll-y::-webkit-scrollbar{width:9px;height:9px}
+.scroll-y::-webkit-scrollbar-thumb{background:rgba(120,180,255,.28);border-radius:9px}
+.scroll-y::-webkit-scrollbar-track{background:transparent}
+
+.btn{
+  appearance:none;border:1px solid var(--line);background:rgba(12,24,44,.6);color:var(--ink);
+  font:500 13px/1 'Poppins',sans-serif;padding:10px 14px;border-radius:11px;cursor:pointer;
+  display:inline-flex;align-items:center;gap:8px;transition:.18s ease;white-space:nowrap;
+}
+.btn:hover{border-color:rgba(0,212,255,.55);background:rgba(0,212,255,.12);transform:translateY(-1px)}
+.btn:active{transform:translateY(0)}
+.btn.icon{padding:10px 12px}
+.btn.solid{background:linear-gradient(135deg,rgba(0,212,255,.9),rgba(0,255,157,.85));color:#04121f;border:none;font-weight:600}
+.btn.solid:hover{filter:brightness(1.08);box-shadow:0 10px 26px rgba(0,212,255,.28)}
+.btn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.btn kbd{font:600 10px/1 var(--mono);border:1px solid var(--line);border-radius:5px;padding:3px 5px;color:var(--dim)}
+.chip{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:999px;
+  border:1px solid var(--line);background:rgba(10,22,40,.6);font-size:12px;color:var(--muted)
+}
+.chip b{color:var(--ink);font-weight:600}
+kbd{font:600 11px/1 var(--mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;
+  padding:3px 6px;background:rgba(12,24,44,.7);color:#cfe6ff;white-space:nowrap}
+
+/* narrow screens */
+@media(max-width:860px){
+  .topbar .sub,.counter{display:none}
+  .btn kbd{display:none}
+  .brand-meta{display:none}
+  .pstep::after{display:none}
+}
+@media(max-width:560px){
+  .home-wrap{padding-bottom:48px}
+  .tile{padding:16px}
+}
+
+/* ============================ HOME ============================ */
+#home{flex-direction:column;align-items:stretch}
+.home-wrap{display:flex;flex-direction:column;flex:1 1 auto;min-height:0;padding:clamp(20px,3.4vw,46px) clamp(18px,4vw,64px) 40px;gap:clamp(20px,3vw,36px)}
+.brandbar{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-badge{
+  width:52px;height:52px;border-radius:15px;display:grid;place-items:center;flex:0 0 auto;
+  background:linear-gradient(135deg,rgba(0,212,255,.22),rgba(0,255,157,.16));
+  border:1px solid rgba(0,212,255,.35);box-shadow:0 0 34px rgba(0,212,255,.18);
+  font:700 15px/1 var(--mono);letter-spacing:.5px;color:#bfefff;
+}
+.brand-text h2{font-size:15px;font-weight:600;letter-spacing:.2px}
+.brand-text p{font-size:12px;color:var(--dim);margin-top:2px}
+.brand-meta{display:flex;gap:8px;flex-wrap:wrap}
+
+.hero{max-width:1000px}
+.hero .eyebrow{
+  font:600 11.5px/1 var(--mono);letter-spacing:2.4px;text-transform:uppercase;color:#5fd8ff;
+  display:inline-flex;align-items:center;gap:10px;margin-bottom:16px
+}
+.hero .eyebrow::before{content:'';width:34px;height:1px;background:linear-gradient(90deg,#00d4ff,transparent)}
+.hero h1{
+  font-size:clamp(30px,4.6vw,58px);line-height:1.06;font-weight:700;letter-spacing:-.5px;
+  background:linear-gradient(96deg,#ffffff 8%,#7fe4ff 42%,#6dffc0 78%,#ffffff 100%);
+  background-size:220% auto;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:shimmer 9s linear infinite;
+}
+@keyframes shimmer{to{background-position:220% center}}
+.hero p.lead{color:var(--muted);font-size:clamp(13.5px,1.15vw,16.5px);line-height:1.65;margin-top:16px;max-width:820px}
+.hero .hint{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--dim)}
+.hero .hint .sep{opacity:.4}
+
+.section-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;flex-wrap:wrap;border-top:1px solid var(--line-soft);padding-top:24px}
+.section-head h2{font-size:clamp(16px,1.5vw,20px);font-weight:600}
+.section-head p{font-size:12.5px;color:var(--dim);margin-top:4px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:clamp(12px,1.4vw,16px)}
+.tile{
+  position:relative;text-align:left;overflow:hidden;cursor:pointer;
+  padding:20px 20px 18px;border-radius:var(--radius);border:1px solid var(--line);
+  background:linear-gradient(158deg,rgba(17,32,58,.92),rgba(9,18,34,.86));
+  transition:transform .22s cubic-bezier(.2,.8,.2,1),border-color .22s,box-shadow .22s;
+  animation:riseIn .5s backwards cubic-bezier(.2,.8,.2,1);
+}
+@keyframes riseIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+.tile::after{
+  content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;opacity:0;transition:.25s;
+  background:radial-gradient(420px 200px at 12% 0%,color-mix(in srgb,var(--a) 22%,transparent),transparent 70%);
+}
+.tile:hover,.tile:focus-visible{transform:translateY(-5px);border-color:color-mix(in srgb,var(--a) 60%,transparent);
+  box-shadow:0 22px 46px rgba(0,0,0,.5),0 0 0 1px color-mix(in srgb,var(--a) 34%,transparent);outline:none}
+.tile:hover::after,.tile:focus-visible::after{opacity:1}
+.tile-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;position:relative;z-index:1}
+.tile-icon{
+  width:46px;height:46px;border-radius:13px;display:grid;place-items:center;font-size:22px;
+  background:color-mix(in srgb,var(--a) 16%,transparent);border:1px solid color-mix(in srgb,var(--a) 40%,transparent);
+}
+.tile-num{font:600 12px/1 var(--mono);color:var(--dim);letter-spacing:1px}
+.tile-h{display:block;font-size:16.5px;font-weight:600;margin-top:15px;line-height:1.32;position:relative;z-index:1}
+.tile-p{display:block;font-size:12.8px;color:var(--muted);line-height:1.55;margin-top:8px;position:relative;z-index:1}
+.tile-foot{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;
+  padding-top:13px;border-top:1px dashed var(--line);position:relative;z-index:1;
+}
+.tile-foot .count{font:600 11.5px/1 var(--mono);color:var(--dim);letter-spacing:.6px}
+.tile-foot .go{display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:color-mix(in srgb,var(--a) 78%,#ffffff)}
+.tile-foot .go svg{transition:transform .22s}
+.tile:hover .tile-foot .go svg{transform:translateX(4px)}
+
+.home-foot{
+  margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+  border-top:1px solid var(--line-soft);padding-top:20px;font-size:12px;color:var(--dim)
+}
+.home-foot .keys{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.home-foot .keys span{display:inline-flex;align-items:center;gap:7px}
+
+/* ============================ DECK ============================ */
+#deck{flex-direction:column}
+.progress-line{height:3px;background:rgba(120,180,255,.12);flex:0 0 auto;overflow:hidden}
+.progress-line i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--good));transition:width .35s ease;box-shadow:0 0 14px rgba(0,212,255,.6)}
+.topbar{
+  display:flex;align-items:center;gap:12px;padding:12px clamp(12px,2vw,22px);
+  border-bottom:1px solid var(--line-soft);background:rgba(6,13,25,.6);backdrop-filter:blur(14px);flex:0 0 auto;
+}
+.topbar .topic-title{display:flex;align-items:center;gap:11px;min-width:0}
+.topbar .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent);flex:0 0 auto}
+.topbar h1{font-size:14.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.topbar .sub{font:600 11px/1 var(--mono);color:var(--dim);letter-spacing:.6px;white-space:nowrap}
+.topbar .spacer{flex:1 1 auto}
+.counter{font:600 12px/1 var(--mono);color:var(--muted);letter-spacing:.5px;white-space:nowrap}
+.counter b{color:var(--ink)}
+
+.stage{flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding:clamp(18px,3.6vh,46px) clamp(16px,4vw,56px) 40px;scrollbar-width:thin;scrollbar-color:rgba(120,180,255,.35) transparent}
+.stage::-webkit-scrollbar{width:9px}
+.stage::-webkit-scrollbar-thumb{background:rgba(120,180,255,.28);border-radius:9px}
+.slide{max-width:1180px;margin:0 auto;animation:slideIn .38s cubic-bezier(.2,.8,.2,1)}
+.slide.back{animation-name:slideInBack}
+@keyframes slideIn{from{opacity:0;transform:translateX(34px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideInBack{from{opacity:0;transform:translateX(-34px)}to{opacity:1;transform:translateX(0)}}
+.slide-tag{
+  display:inline-flex;align-items:center;gap:9px;font:600 10.5px/1 var(--mono);letter-spacing:2px;
+  text-transform:uppercase;color:color-mix(in srgb,var(--accent) 82%,#ffffff);margin-bottom:14px
+}
+.slide-tag::before{content:'';width:26px;height:1px;background:currentColor;opacity:.6}
+.slide h2{font-size:clamp(21px,2.5vw,34px);line-height:1.18;font-weight:600;letter-spacing:-.3px}
+.slide h2 em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--good));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.s-lead{color:var(--muted);font-size:clamp(13.5px,1.05vw,16px);line-height:1.62;margin-top:13px;max-width:950px}
+.s-body{margin-top:clamp(20px,3vh,32px)}
+.footnote{margin-top:22px;padding:13px 16px;border-radius:13px;border:1px dashed var(--line);
+  background:rgba(10,22,40,.5);font-size:12.5px;color:var(--muted);line-height:1.6;display:flex;gap:11px}
+.footnote b{color:var(--ink)}
+.footnote .fi{flex:0 0 auto}
+
+/* bullets */
+.bullets{display:grid;gap:11px}
+.bullets.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:900px){.bullets.two{grid-template-columns:1fr}}
+.bullet{
+  display:flex;gap:12px;padding:14px 16px;border-radius:14px;border:1px solid var(--line);
+  background:linear-gradient(150deg,rgba(15,29,52,.72),rgba(8,17,32,.62));transition:.2s
+}
+.bullet:hover{border-color:color-mix(in srgb,var(--accent) 45%,transparent);transform:translateX(3px)}
+.bullet .mark{flex:0 0 auto;width:20px;height:20px;border-radius:7px;display:grid;place-items:center;margin-top:2px;
+  background:color-mix(in srgb,var(--accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--accent) 42%,transparent);
+  color:color-mix(in srgb,var(--accent) 85%,#ffffff);font:700 10px/1 var(--mono)}
+.bullet .txt{font-size:13.6px;line-height:1.6;color:#d8e7fa}
+.bullet .txt strong{color:#fff;font-weight:600}
+.bullet .txt .lbl{display:block;color:#fff;font-weight:600;margin-bottom:3px}
+.bullet .txt .desc{color:var(--muted);font-size:13px}
+
+/* table */
+.table-wrap{border:1px solid var(--line);border-radius:16px;overflow:auto;background:rgba(9,18,34,.6)}
+table{width:100%;border-collapse:collapse;font-size:13.4px;min-width:560px}
+thead th{
+  text-align:left;padding:13px 15px;font-weight:600;font-size:12px;letter-spacing:.5px;text-transform:uppercase;
+  color:#dff1ff;background:color-mix(in srgb,var(--accent) 16%,rgba(10,20,38,.9));border-bottom:1px solid var(--line);white-space:nowrap
+}
+tbody td{padding:12px 15px;border-bottom:1px solid var(--line-soft);color:#cfe1f6;line-height:1.55;vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover td{background:rgba(0,212,255,.055)}
+tbody td:first-child{color:#fff;font-weight:500}
+td .pill{display:inline-block;padding:3px 9px;border-radius:999px;font:600 11px/1.5 var(--mono);
+  background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 36%,transparent)}
+
+/* cards */
+.cards{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(228px,1fr))}
+.card{
+  padding:17px;border-radius:16px;border:1px solid var(--line);
+  background:linear-gradient(155deg,rgba(16,31,55,.78),rgba(8,17,32,.62));transition:.22s;position:relative;overflow:hidden
+}
+.card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:.85}
+.card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 48%,transparent);box-shadow:0 16px 34px rgba(0,0,0,.42)}
+.card .ci{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:17px;
+  background:color-mix(in srgb,var(--accent) 15%,transparent);border:1px solid color-mix(in srgb,var(--accent) 34%,transparent);margin-bottom:12px}
+.card h4{font-size:14.6px;font-weight:600;line-height:1.35}
+.card p{font-size:12.8px;color:var(--muted);line-height:1.58;margin-top:7px}
+
+/* process */
+.process{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(196px,1fr))}
+.pstep{
+  position:relative;padding:18px 16px 16px;border-radius:15px;border:1px solid var(--line);
+  background:linear-gradient(160deg,rgba(16,31,55,.8),rgba(8,17,32,.6));transition:.22s
+}
+.pstep:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--accent) 48%,transparent)}
+.pstep .n{
+  width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font:700 12px/1 var(--mono);
+  background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 88%,#ffffff),color-mix(in srgb,var(--accent) 45%,transparent));
+  color:#04121f;margin-bottom:12px;box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 30%,transparent)
+}
+.pstep h4{font-size:14px;font-weight:600;line-height:1.35}
+.pstep p{font-size:12.6px;color:var(--muted);line-height:1.55;margin-top:6px}
+.pstep::after{
+  content:'';position:absolute;right:-9px;top:32px;width:8px;height:8px;border-top:2px solid var(--line);
+  border-right:2px solid var(--line);transform:rotate(45deg)
+}
+.pstep:last-child::after{display:none}
+@media(max-width:760px){.pstep::after{display:none}}
+
+/* stats */
+.stats{display:grid;gap:13px;grid-template-columns:repeat(auto-fit,minmax(158px,1fr))}
+.stat{
+  padding:18px;border-radius:16px;border:1px solid var(--line);text-align:left;
+  background:linear-gradient(160deg,rgba(16,31,55,.78),rgba(8,17,32,.6))
+}
+.stat .v{font-size:clamp(23px,2.7vw,36px);font-weight:700;line-height:1.05;letter-spacing:-.5px;
+  background:linear-gradient(100deg,#ffffff,color-mix(in srgb,var(--accent) 92%,#ffffff));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.stat .u{font-size:12px;color:var(--dim);margin-left:4px;-webkit-text-fill-color:var(--dim)}
+.stat .l{font-size:12.4px;color:var(--muted);line-height:1.5;margin-top:9px}
+
+/* compare */
+.compare{display:grid;gap:15px;grid-template-columns:1fr 1fr}
+@media(max-width:860px){.compare{grid-template-columns:1fr}}
+.panel{padding:18px;border-radius:16px;border:1px solid var(--line);background:linear-gradient(158deg,rgba(16,31,55,.78),rgba(8,17,32,.6))}
+.panel h4{font-size:14.5px;font-weight:600;display:flex;align-items:center;gap:9px;margin-bottom:13px}
+.panel h4 .badge{font:700 10px/1 var(--mono);padding:5px 8px;border-radius:7px;letter-spacing:.8px}
+.panel.a h4 .badge{background:rgba(0,212,255,.16);border:1px solid rgba(0,212,255,.4);color:#8fe7ff}
+.panel.b h4 .badge{background:rgba(0,255,157,.14);border:1px solid rgba(0,255,157,.4);color:#8dffcd}
+.panel ul{list-style:none;display:grid;gap:9px}
+.panel li{font-size:13.2px;color:#cfe1f6;line-height:1.55;display:flex;gap:10px}
+.panel li::before{content:'▸';color:color-mix(in srgb,var(--accent) 85%,#fff);flex:0 0 auto}
+
+/* callout strip */
+.callout{
+  display:flex;gap:14px;align-items:flex-start;padding:16px 18px;border-radius:15px;
+  border:1px solid color-mix(in srgb,var(--accent) 34%,transparent);
+  background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 12%,transparent),rgba(9,18,34,.6))
+}
+.callout .ci{font-size:19px;line-height:1}
+.callout h4{font-size:13.6px;font-weight:600;margin-bottom:4px}
+.callout p{font-size:12.9px;color:var(--muted);line-height:1.6}
+
+/* mini flow of the module on the intro slide */
+.outline{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));margin-top:6px}
+.outline .oi{display:flex;gap:11px;padding:12px 14px;border-radius:13px;border:1px dashed var(--line);background:rgba(9,18,34,.45)}
+.outline .oi .num{font:700 11px/1 var(--mono);color:color-mix(in srgb,var(--accent) 85%,#fff);padding-top:2px}
+.outline .oi span{font-size:12.7px;color:#d8e7fa;line-height:1.5}
+
+/* notes */
+.notes{
+  display:none;flex:0 0 auto;border-top:1px solid var(--line-soft);background:rgba(6,13,25,.72);
+  padding:14px clamp(16px,4vw,56px);backdrop-filter:blur(10px)
+}
+.notes.on{display:block}
+.notes h5{font:600 10.5px/1 var(--mono);letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:8px}
+.notes p{font-size:13px;color:var(--muted);line-height:1.65;max-width:1180px}
+
+/* bottombar */
+.bottombar{
+  display:flex;align-items:center;gap:12px;padding:12px clamp(12px,2vw,22px);
+  border-top:1px solid var(--line-soft);background:rgba(6,13,25,.72);backdrop-filter:blur(14px);flex:0 0 auto
+}
+.dots{display:flex;gap:7px;flex:1 1 auto;overflow-x:auto;padding:4px 2px;scrollbar-width:none}
+.dots::-webkit-scrollbar{display:none}
+.dot-btn{
+  width:26px;height:6px;border-radius:999px;border:1px solid var(--line);background:rgba(120,180,255,.14);
+  cursor:pointer;flex:0 0 auto;transition:.2s;padding:0
+}
+.dot-btn:hover{background:rgba(120,180,255,.4)}
+.dot-btn.on{background:linear-gradient(90deg,var(--accent),var(--good));width:40px;border-color:transparent;box-shadow:0 0 12px color-mix(in srgb,var(--accent) 45%,transparent)}
+.nav-btns{display:flex;gap:8px;align-items:center;flex:0 0 auto}
+
+/* jump menu inside deck */
+.jump{
+  position:fixed;inset:0;z-index:40;display:none;background:rgba(3,8,16,.7);backdrop-filter:blur(7px);
+  align-items:center;justify-content:center;padding:22px
+}
+.jump.on{display:flex}
+.jump-panel{
+  width:min(1000px,100%);max-height:88vh;overflow:auto;border-radius:20px;border:1px solid var(--line);
+  background:linear-gradient(160deg,rgba(13,26,47,.98),rgba(7,14,27,.98));padding:22px
+}
+.jump-panel h3{font-size:15px;font-weight:600;margin-bottom:4px}
+.jump-panel .jp-sub{font-size:12.5px;color:var(--dim);margin-bottom:16px}
+.jump-grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(215px,1fr))}
+.jump-item{
+  text-align:left;padding:13px;border-radius:13px;border:1px solid var(--line);cursor:pointer;
+  background:rgba(12,24,44,.6);color:var(--ink);font-family:inherit;transition:.2s
+}
+.jump-item:hover{border-color:color-mix(in srgb,var(--a) 55%,transparent);background:color-mix(in srgb,var(--a) 10%,rgba(12,24,44,.7));transform:translateY(-2px)}
+.jump-item b{display:block;font-size:12.8px;font-weight:600;color:#fff}
+.jump-item span{display:block;font-size:11.4px;color:var(--dim);margin-top:5px;line-height:1.45}
+
+/* print → export current module as PDF */
+@media print{
+  body{background:#fff;color:#000;overflow:visible;-webkit-print-color-adjust:economy;print-color-adjust:economy}
+  .home-wrap,.stage{overflow:visible!important;height:auto!important}
+  .tile,.card,.pstep,.stat,.bullet,.panel,.table-wrap,.callout,.outline .oi,.footnote,.notes{
+    background:#fff!important;border-color:#c3d2e3!important;box-shadow:none!important}
+  .tile-h,.slide h2,.card h4,.pstep h4,.stat .l,.bullet .lbl,.panel h4,.callout h4,.tile-foot .go{color:#0a2a44!important}
+  .tile-p,.s-lead,.bullet .desc,.card p,.pstep p,.stat .l,.callout p,.footnote,.notes p,.tile-foot .count{color:#33506b!important}
+  .slide h2 em,.stat .v{-webkit-text-fill-color:#0a5f8a!important;background:none!important;color:#0a5f8a!important}
+  .slide-tag{color:#0a6f96!important}
+  thead th{background:#eaf2fb!important;color:#0a2a44!important;border-bottom:1px solid #c3d2e3!important}
+  tbody td{color:#1d3a55!important;border-bottom:1px solid #dbe6f2!important}
+  tbody td:first-child{color:#0a2a44!important}
+  .card::before,.bullet .mark,.pstep .n{background:#dceaf7!important;border-color:#9fc3e0!important;color:#0a4f75!important}
+  .btn{display:none!important}
+  .tile-foot .count{color:#5b7188!important}
+  body::before,.particles,.topbar,.bottombar,.notes,.progress-line,.jump{display:none!important}
+  .stage{overflow:visible;padding:0}
+  .slide{animation:none;break-after:page;page-break-after:always;padding:18px 0}
+  .slide:last-child{break-after:auto}
+  .bullets .bullet,.card,.pstep,.stat,.panel,.bullet,.table-wrap{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="particles" id="particles" aria-hidden="true"></div>
+
+<div class="app">
+  <!-- ==================== MAIN PAGE (TOPIC MENU) ==================== -->
+  <section class="view on" id="home">
+    <div class="home-wrap scroll-y">
+      <div class="brandbar">
+        <div class="brand">
+          <div class="brand-badge">GMP</div>
+          <div class="brand-text">
+            <h2>Cleanroom &amp; Aseptic Operations</h2>
+            <p>Training presentation · EU GMP Annex 1 · ISO 14644 · 21 CFR 211</p>
+          </div>
+        </div>
+        <div class="brand-meta">
+          <span class="chip">🧩 <b id="chipModules">9</b> modules</span>
+          <span class="chip">📑 <b id="chipSlides">—</b> slides</span>
+          <span class="chip">🖱️ click a topic to open its deck</span>
+        </div>
+      </div>
+
+      <div class="hero">
+        <span class="eyebrow">Interactive deck · Select a module</span>
+        <h1>Contamination Control &amp; GMP<br>in Sterile Manufacturing</h1>
+        <p class="lead">
+          Pick any topic below to open its slide deck. Each module runs like a normal presentation —
+          click <b>Next</b> or press <kbd>→</kbd>, jump between slides with the progress dots, and press
+          <kbd>Esc</kbd> any time to come back to this main page.
+        </p>
+        <div class="hint">
+          <span>⌨️ <b>→ / Space</b> next</span><span class="sep">·</span>
+          <span><b>←</b> previous</span><span class="sep">·</span>
+          <span><b>Esc</b> main page</span><span class="sep">·</span>
+          <span><b>N</b> speaker notes</span><span class="sep">·</span>
+          <span><b>F</b> fullscreen</span><span class="sep">·</span>
+          <span><b>G</b> slide index</span>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <h2>Choose a topic</h2>
+          <p>Nine modules · GMP-aligned content with limits, tables and inspection points</p>
+        </div>
+        <button class="btn" id="startFirst">▶ Start from module 1</button>
+      </div>
+
+      <div class="grid" id="topicGrid"></div>
+
+      <div class="home-foot">
+        <span>Prepared as a training / refresher deck for sterile manufacturing and cleanroom operations.</span>
+        <span class="keys">
+          <button class="btn" id="printHome">🖨️ Print / PDF</button>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== DECK VIEW ==================== -->
+  <section class="view" id="deck">
+    <div class="progress-line"><i id="progressBar"></i></div>
+    <div class="topbar">
+      <button class="btn" id="btnHome">← <span>Main page</span> <kbd>Esc</kbd></button>
+      <div class="topic-title">
+        <span class="dot" id="topicDot"></span>
+        <h1 id="deckTopicTitle">Topic</h1>
+      </div>
+      <span class="sub" id="deckTopicSub">Module 01</span>
+      <span class="spacer"></span>
+      <span class="counter"><b id="slideNow">1</b> / <span id="slideTotal">1</span></span>
+      <button class="btn icon" id="btnNotes" title="Speaker notes (N)">🗒️</button>
+      <button class="btn icon" id="btnJump" title="Slide index (G)">☰</button>
+      <button class="btn icon" id="btnFull" title="Fullscreen (F)">⛶</button>
+    </div>
+
+    <div class="stage scroll-y" id="stage"></div>
+
+    <div class="notes" id="notesPanel">
+      <h5>Speaker notes</h5>
+      <p id="notesText">—</p>
+    </div>
+
+    <div class="bottombar">
+      <button class="btn" id="btnPrev">← Prev</button>
+      <div class="dots" id="dots"></div>
+      <div class="nav-btns">
+        <button class="btn" id="btnNextTopic" style="display:none">Next module →</button>
+        <button class="btn solid" id="btnNext">Next →</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- slide index overlay -->
+<div class="jump" id="jump">
+  <div class="jump-panel scroll-y">
+    <h3>Slide index</h3>
+    <p class="jp-sub" id="jumpSub">Jump to any slide in this module — or open another module.</p>
+    <div class="jump-grid" id="jumpGrid"></div>
+  </div>
+</div>
+<script>
+/* =====================================================================
+   PRESENTATION CONTENT — 9 modules, each with its own slide deck
+   Slide types: bullets | table | cards | process | stats | compare
+   ===================================================================== */
+const MODULES = [
+  /* ------------------------------------------------------------------ 01 */
+  {
+    id: "cleanroom-facility-design",
+    num: "01",
+    icon: "🏭",
+    accent: "#00d4ff",
+    title: "Cleanroom & Facility Design",
+    short: "Layout, zoning, classification and finishes that keep particles and microbes away from the product.",
+    tags: ["EU GMP Grade A–D", "ISO 14644", "CCS"],
+    aim: "Design a facility where product, personnel and material flows, room finishes and pressure regimes work together to keep contamination out of the critical zone.",
+    outline: [
+      "What makes a room a 'cleanroom'",
+      "Grade A–D vs ISO 14644 classification",
+      "Layout, zoning, airlocks and material transfer",
+      "Finishes, services and cleanability",
+      "Strategic design controls and barrier technology"
+    ],
+    note: "Frame the module: design is the first and cheapest place to control contamination. Every later problem — gowning, monitoring, deviations — starts with how the facility was built.",
+    slides: [
+      {
+        k: "bullets",
+        title: "What makes a room a <em>cleanroom</em>?",
+        lead: "A cleanroom is a room in which the concentration of airborne particles is controlled to specified limits — built, operated and maintained to minimise the introduction, generation and retention of contamination.",
+        items: [
+          { t: "Parameters under control", d: "Airborne particulates, viable organisms, temperature, humidity, pressure differentials, airflow pattern and, where relevant, noise, vibration and lighting." },
+          { t: "Source-focused design", d: "The design must reduce particle generation from people, equipment and surfaces, and must allow effective cleaning and disinfection." },
+          { t: "Two protection goals", d: "Protect the product from contamination; contain hazardous or highly potent product away from operators and the environment." },
+          { t: "ISO 14644 is the technical backbone", d: "Internationally accepted classification, test methods and cleanroom design standards, referenced by EU GMP Annex 1." },
+          { t: "GMP grade is not the same as ISO class", d: "Grade A–D is the operational standard for sterile manufacture and is defined 'at rest' and 'in operation'." },
+          { t: "Risk-based classification", d: "Classification, layout and controls are derived from the product, the process and a documented Contamination Control Strategy (CCS)." }
+        ],
+        call: { i: "🔎", t: "Inspection point", d: "Inspectors look for the documented link: product CQAs → contamination risks → design features → the room classification actually demonstrated by qualification data." },
+        note: "Open with the fact that a cleanroom is defined by measurable limits, not by appearance. Design decisions must trace back to patient and product risk."
+      },
+      {
+        k: "table",
+        title: "EU GMP Grades vs ISO 14644",
+        lead: "Sterile manufacturing is classified by GMP grade. ISO 14644 provides the particle-counting method and the class equivalents behind those grades.",
+        head: ["Grade", "At rest (particles ≥ 0.5 µm /m³)", "In operation", "Typical use"],
+        rows: [
+          ["Grade A", "ISO 5 — 3 520", "Same 3 520 limit (20 /m³ at ≥ 5 µm)", "Aseptic filling, stopper bowls, open vials and ampoules, aseptic connections. Unidirectional airflow at 0.45 m/s ± 20 %."],
+          ["Grade B", "ISO 5 — 3 520", "ISO 7 — 352 000", "Background (clean zone) surrounding the Grade A aseptic zone."],
+          ["Grade C", "ISO 7 — 352 000", "ISO 8 — 3 520 000", "Less critical stages of sterile manufacture; terminally sterilised products; buffer areas."],
+          ["Grade D", "ISO 8 — 3 520 000", "Not defined for operation", "Supporting areas such as material and personnel entry, and some non-critical steps."]
+        ],
+        foot: { n: "Remember", t: "Classification is verified by particle counts at rest and in operation (ISO 14644-1), backed by the viable limits of Annex 1 Table 2 — and re-verified after changes." },
+        note: "Ask the audience: what is a Grade B room 'in operation'? Answer: ISO 7. This trips people up in audits and in batch records."
+      },
+      {
+        k: "bullets",
+        two: true,
+        title: "Layout, zoning and <em>flows</em>",
+        lead: "Contamination is controlled by physical separation and one-way movement — never by hoping that people take the short, clean route.",
+        items: [
+          { t: "Zoning by risk", d: "Grade A core → Grade B surround → Grade C/D support. Products, people and materials move from cleaner to less clean areas, never backwards." },
+          { t: "Segregated personnel and material flows", d: "Separate entry and exit for people and materials; pass-through hatches and airlocks with interlocked doors." },
+          { t: "Correct airlock staging", d: "Grade B entry through a Grade B changing room, with separate cubicles or airlocks; Annex 1 expects one person at a time in Grade B changing rooms." },
+          { t: "Containment for hazardous products", d: "Dedicated or negative-pressure areas with validated HEPA exhaust for penicillins, beta-lactams, cytotoxics, hormones and live organisms." },
+          { t: "Material transfer discipline", d: "Interlocked transfer hatches, wiping or spraying with validated disinfectant, and sterilisation paths for components going to Grade A." },
+          { t: "Services and equipment placement", d: "Design out ledges and crevices, keep drains out of Grade A/B where possible, and allow maintenance from lower-grade spaces." }
+        ],
+        note: "Use a simple floor-plan sketch: draw the flows and show why a shared corridor between clean and dirty routes is a design defect, not a training problem."
+      },
+      {
+        k: "cards",
+        title: "Room finishes and <em>cleanability</em>",
+        lead: "Surfaces must not shed particles, must not harbour micro-organisms, and must be cleanable — verified during qualification and maintained afterwards.",
+        cards: [
+          { i: "🧱", t: "Walls, ceilings, floors", d: "Smooth, non-shedding, non-porous and impact resistant; coved junctions; sealed light fittings; welded sheet vinyl, epoxy or terrazzo flooring with no cracks." },
+          { i: "🔩", t: "Materials of construction", d: "316L stainless steel for product-contact surfaces; no flaking paint, no wood, no cardboard; panels that survive repeated disinfection." },
+          { i: "🧼", t: "Designed for cleaning", d: "Rounded corners, minimum ledges and horizontal surfaces, flush-mounted utilities, cleanable drain covers with traps." },
+          { i: "🚪", t: "Doors and windows", d: "Non-shedding, self-closing, flush glazing, interlocked where required; vision panels reduce unnecessary entry into critical rooms." },
+          { i: "💡", t: "Lighting and acoustics", d: "Sealed, flush luminaires with sufficient light (typically 300–500 lux in inspection areas) and minimal heat load; noise kept at a level that does not distract operators." },
+          { i: "📐", t: "Space and layout", d: "Enough room for operations, movement and cleaning so nobody crowds the critical zone or reaches over open product." }
+        ],
+        note: "Point out that cleanability is a design attribute to be verified through cleaning validation — not an assumption made after handover."
+      },
+      {
+        k: "bullets",
+        title: "Strategic design controls and <em>barrier technology</em>",
+        lead: "Annex 1 pushes the industry from procedural control towards technical control: separate people from the product wherever you can.",
+        items: [
+          { t: "Contamination Control Strategy (CCS)", d: "A documented, site-wide strategy covering facility and equipment design, personnel, utilities, cleaning, monitoring and organisational controls." },
+          { t: "Quality by Design from the URS", d: "Design reviews and risk assessments during design; each design feature traceable to a user requirement and a risk." },
+          { t: "Prefer barriers over operators", d: "Isolators or RABS are the expected technology for aseptic processing — open Grade A with hands inside the zone is hard to justify." },
+          { t: "Automate and separate", d: "Robotic filling, automatic loading and unloading, and closed transfers reduce the number and the impact of interventions." },
+          { t: "Design in the monitoring layer", d: "Particle counters, pressure transmitters, temperature and humidity sensors and alarm annunciation to BMS/EMS are part of the design, not retrofits." },
+          { t: "Design for maintenance and change", d: "Plan filter replacement, equipment repair and cleaning so the environment is not compromised — and so requalification scope stays manageable." }
+        ],
+        call: { i: "💡", t: "Key principle", d: "Good design reduces reliance on procedure. If the room only works when people behave perfectly, the design is not robust enough." },
+        note: "Close the module by linking design to the CCS — this is what Annex 1 inspectors ask to see first, and it starts here."
+      }
+    ]
+  },
+
+  /* ------------------------------------------------------------------ 02 */
+  {
+    id: "qualification-validation",
+    num: "02",
+    icon: "✅",
+    accent: "#00ff9d",
+    title: "Qualification & Validation",
+    short: "Proving — with documented evidence — that facilities, utilities and processes perform as intended, every time.",
+    tags: ["Annex 15", "DQ · IQ · OQ · PQ", "Lifecycle"],
+    aim: "Understand how a facility, utility, system or process is proven to be fit for purpose through documented evidence across its whole lifecycle.",
+    outline: [
+      "Validation vs qualification",
+      "The V-model: URS → DQ → IQ → OQ → PQ",
+      "Documentation: VMP, protocols, traceability",
+      "Cleanroom and HVAC qualification tests",
+      "Requalification, change control and data integrity"
+    ],
+    note: "Set expectations: this module is about evidence. Every claim about the facility must be traceable to a protocol, a result and an approval.",
+    slides: [
+      {
+        k: "bullets",
+        title: "Qualification vs <em>validation</em>",
+        lead: "The words are often used interchangeably, but they describe different — and complementary — activities.",
+        items: [
+          { t: "Validation", d: "Documented evidence giving a high degree of assurance that a specific process consistently delivers a product meeting its predetermined specifications and quality attributes." },
+          { t: "Qualification", d: "Proving that premises, equipment, utilities and systems are correctly installed and operate as intended — the 'hardware' evidence behind validation." },
+          { t: "Lifecycle thinking", d: "From URS and design through commissioning, qualification, routine use, change control and decommissioning. It is not a one-off event before launch." },
+          { t: "Risk-based depth", d: "ICH Q9 risk management decides how much testing and documentation each system needs, based on its impact on product quality." },
+          { t: "The deliverable is documentation", d: "Plan → protocol → execution → results → report → approval → SOP. Undocumented work does not exist as evidence." },
+          { t: "Regulatory basis", d: "EU GMP Annex 15 (Qualification & Validation), together with Annex 1 for sterile-specific expectations." }
+        ],
+        note: "Keep the distinction practical: qualification proves the equipment; process validation proves the process running on qualified equipment."
+      },
+      {
+        k: "process",
+        title: "The <em>V-model</em> — from requirements to routine performance",
+        lead: "Each phase is approved before the next begins. The document trail goes down the left side of the V (requirements) and up the right side (evidence).",
+        steps: [
+          { t: "URS — User Requirement Specification", d: "What the system must achieve: operating ranges, capacity, materials, controls and acceptance criteria, expressed in terms of product and process needs." },
+          { t: "DQ — Design Qualification", d: "Documented review that drawings, specifications and calculations meet the URS — before construction or purchase." },
+          { t: "IQ — Installation Qualification", d: "Verify correct installation: materials of construction, dimensions, utilities, calibration status, as-built drawings and vendor documentation." },
+          { t: "OQ — Operational Qualification", d: "Challenge the system across its operating range and alarms, including worst cases and control-system behaviour." },
+          { t: "PQ — Performance Qualification", d: "Demonstrate performance under routine production conditions, typically over defined runs with product and process data." },
+          { t: "Ongoing verification", d: "Periodic requalification, calibration, monitoring, change control and review keep the validated state — closing the loop back to the URS." }
+        ],
+        note: "Stress that OQ tests the edges and alarms while PQ proves routine performance. Many sites fail inspections by treating PQ as a repeat of OQ."
+      },
+      {
+        k: "bullets",
+        two: true,
+        title: "Documents you must be able to <em>produce</em>",
+        lead: "In an inspection the question is not 'did you qualify it?' but 'show me how you know, and who approved it'.",
+        items: [
+          { t: "Validation Master Plan (VMP)", d: "Scope, philosophy, responsibilities, acceptance criteria and schedules for initial and periodic requalification." },
+          { t: "Protocols and reports", d: "Pre-approved protocols with defined tests, methods and acceptance criteria; executed records; summary reports with deviations and conclusions." },
+          { t: "Traceability matrix", d: "Requirement-to-test matrix showing every URS point is covered by at least one qualification test — a favourite inspection request." },
+          { t: "SOPs and training records", d: "Approved operating, cleaning, monitoring and maintenance procedures with documented training before routine use." },
+          { t: "Calibration and instrument list", d: "Critical instruments calibrated against traceable standards, with current certificates verified during qualification and maintained in routine use." },
+          { t: "Deviations and change control", d: "Every qualification deviation handled and closed; any change after qualification assessed for impact and, where required, requalified." }
+        ],
+        note: "Ask: who signs the protocol before execution? If a protocol is signed only after execution, the whole evidence chain is questioned."
+      },
+      {
+        k: "table",
+        title: "Cleanroom and HVAC <em>qualification tests</em>",
+        lead: "The core test package documented in the VMP — repeated on requalification and after any change that could affect performance.",
+        head: ["Test", "Method and typical acceptance criteria"],
+        rows: [
+          ["Filter integrity (leak test)", "PAO or DOP aerosol upstream, photometer scan downstream — penetration ≤ 0.01 % for H14-class filters; repeated after any filter change."],
+          ["Airflow volume and air changes", "Measured at terminals and diffusers. Grade A 0.45 m/s ± 20 %; Grade B/C typically ≥ 20–40 ACH; Grade D lower, justified by recovery data."],
+          ["Pressure differentials", "≥ 10 Pa between areas of different classification (commonly 10–15 Pa); correct cascade confirmed with doors closed and during door-open events."],
+          ["Airflow visualisation (smoke study)", "Unidirectional flow with no dead zones, eddies or reverse flow over the critical zone; recorded and reviewed; repeated after layout changes."],
+          ["Recovery (clean-up) time", "After a challenge, particle counts return within the 'at rest' limits — typically 15–20 minutes, as expected by Annex 1."],
+          ["Particle counting and viable monitoring", "ISO 14644-1 sampling for classification (at rest and in operation) plus Annex 1 viable limits; results become the EM baseline for routine comparison."],
+          ["Temperature, humidity and other parameters", "Mapped and recorded within specified ranges — for example 18–22 °C and 45–60 % RH unless the product requires tighter control."]
+        ],
+        foot: { n: "Tip", t: "Record the exact conditions of every test: number of operators present, test equipment IDs and calibration status, sampling points, and any deviation from the approved protocol." },
+        note: "If asked for one favourite: recovery time. It links design (ACH, HEPA coverage, layout) with the operational reality of rooms full of people."
+      },
+      {
+        k: "bullets",
+        title: "Requalification, change control and <em>data integrity</em>",
+        lead: "Qualification is not finished at the report — the validated state has to be maintained and defended for the life of the facility.",
+        items: [
+          { t: "Scheduled requalification", d: "Commonly every 6–12 months for Grade A/B and annually for Grade C/D — frequencies and test scope defined in the VMP." },
+          { t: "Event-driven requalification", d: "After significant changes (filters, ceilings, doors, layout, HVAC), repeated EM excursions, critical deviations, long shutdowns or intrusive maintenance." },
+          { t: "Change control comes first", d: "Any change to design, equipment, materials, procedures or software is assessed for impact on validated status before implementation." },
+          { t: "Continuous verification", d: "Routine pressure, particle and environmental data support the validated state; trends are reviewed in the PQR/APQR and management review." },
+          { t: "Data integrity — ALCOA+", d: "Attributable, Legible, Contemporaneous, Original, Accurate records; complete audit trails for computerised systems (Annex 11 / 21 CFR Part 11)." },
+          { t: "Periodic review of the whole package", d: "SOPs, drawings, maintenance records, calibration, pest control and training reviewed together to confirm the facility is still in its qualified state." }
+        ],
+        call: { i: "🔄", t: "Rule of thumb", d: "If you cannot describe what changed, what it affects and how you verified it, assume the system is no longer in a validated state." },
+        note: "Close by connecting to deviation management: repeated deviations in the same system should automatically raise a requalification question."
+      }
+    ]
+  },
+
+  /* ------------------------------------------------------------------ 03 */
+  {
+    id: "personnel-entry-gowning",
+    num: "03",
+    icon: "🧥",
+    accent: "#ffb347",
+    title: "Personnel Entry & Gowning",
+    short: "People are the biggest contamination source — entry flow, gowning and behaviour are the controls.",
+    tags: ["Gown qualification", "Entry flow", "Behaviour"],
+    aim: "Understand why personnel dominate contamination risk, and how entry flow, gowning sequence and behaviour protect the critical zone.",
+    outline: [
+      "People as the main contamination source",
+      "Entry flow: site → D/C → B → A",
+      "The gowning sequence and its logic",
+      "Behaviour rules inside the critical area",
+      "Gown qualification, personnel monitoring and training"
+    ],
+    note: "This module usually lands hardest: the audience should leave understanding that their own body is the largest contamination risk in the room.",
+    slides: [
+      {
+        k: "stats",
+        title: "People: the biggest <em>contamination source</em>",
+        lead: "Every control in the facility — air changes, pressure cascades, gowning, behaviour rules — exists primarily because of the person standing in the room.",
+        stats: [
+          { v: "~10⁹", u: "skin cells/day", l: "Shed by a human being, each carrying micro-organisms" },
+          { v: "10⁶–10⁷", u: "particles/min", l: "Released during normal movement — far more when moving quickly" },
+          { v: "~1 000", u: "CFU/person/hour", l: "Order of magnitude of microbial dispersal in cleanroom conditions" },
+          { v: "1", u: "operator", l: "A single gowning breach can compromise an entire filling session" },
+          { v: "0.45", u: "m/s", l: "Grade A first-air velocity designed to sweep your particles away from open product" }
+        ],
+        call: { i: "🧥", t: "Design intent of the gown", d: "The gown is both a filter and a barrier: it must cover all skin and hair, trap particles before they escape, and be donned in a sequence that keeps its outer surface clean." },
+        note: "Use the skin-cell figure with care — emphasise the order of magnitude and the principle, not an exact number."
+      },
+      {
+        k: "process",
+        title: "Entry flow into a sterile facility",
+        lead: "Entry is progressive and one-directional: each stage reduces contamination before the next, and no stage can be skipped or reversed.",
+        steps: [
+          { t: "Site entry and outer change", d: "Outdoor clothing and shoes removed or covered; jewellery, watches, phones, make-up and personal items left outside the facility." },
+          { t: "Hand hygiene", d: "Wash hands thoroughly and use approved disinfectant; re-sanitise hands at every gowning stage before touching cleanroom garments." },
+          { t: "Grade D/C gowning", d: "Cleanroom coverall, hair cover or hood, face mask and dedicated footwear or shoe covers — street clothing contamination is contained." },
+          { t: "Air lock / change room for Grade B", d: "Interlocked doors, separate cubicles or airlocks; Annex 1 expects one person at a time in Grade B change rooms to avoid cross-contamination." },
+          { t: "Sterile gown for Grade A/B", d: "Sterile, non-shedding gown worn over the Grade C garments, plus sterile gloves, mask or balaclava and goggles; glove cuffs go over the gown cuffs." },
+          { t: "Verification and entry", d: "Mirror or buddy check of the gown, final hand disinfection, then entry to Grade B and into Grade A using aseptic technique." }
+        ],
+        note: "Walk the audience through the sequence slowly — the most common failure is gaps at the wrists, neck and ankles, not missed stages."
+      },
+      {
+        k: "bullets",
+        two: true,
+        title: "Behaviour inside the <em>critical area</em>",
+        lead: "Gowning gets you into the room; behaviour keeps you from contaminating it. Movement, hands and awareness are the operating controls.",
+        items: [
+          { t: "Move slowly and deliberately", d: "Fast movement creates turbulent air and wakes that carry particles into the critical zone; slow movement preserves unidirectional airflow." },
+          { t: "Keep hands below shoulder level near open product", d: "Anything above an open container means particles falling directly into it — including your own arm's shed." },
+          { t: "Re-sanitise gloves regularly", d: "After contact with equipment, doors or any other surface, and at defined points in the process." },
+          { t: "Report every breach immediately", d: "Torn glove, sneeze inside the mask, gown damage or a fall all require reporting, regowning and, where needed, a deviation." },
+          { t: "No make-up, perfume, jewellery, false nails or exposed hair", d: "All of these shed particles or micro-organisms and are prohibited before entering the gowning area." },
+          { t: "No mobiles, personal pens, cardboard, wood or food", d: "Use cleanroom-approved stationery and dedicated logbooks; cardboard and wood shed fibres and harbour organisms." },
+          { t: "Never move back up a grade in the same gown", d: "Re-entering a cleaner grade requires re-gowning — never a shortcut through a corridor or a hatch." },
+          { t: "Do not hold doors or rush airlocks", d: "Interlocks protect the pressure cascade and airflow; forcing or holding doors is a contamination event." }
+        ],
+        note: "Ask the room: where is your hand-disinfection point before an intervention? If people hesitate, the SOP or the training needs work."
+      },
+      {
+        k: "cards",
+        title: "Gown qualification, monitoring and <em>training</em>",
+        lead: "Because people are the main risk, personnel competence is itself a qualified, monitored and documented control.",
+        cards: [
+          { i: "📋", t: "Gown qualification", d: "Personnel are qualified for gowning and aseptic behaviour before entering Grade A/B areas, and requalified periodically (commonly annually)." },
+          { i: "🖐️", t: "Personnel monitoring", d: "Glove prints (each hand or five fingers) plus chest and forearm gown plates; typical Grade A limit < 1 CFU and Grade B ≤ 5 CFU per plate, with site action limits." },
+          { i: "👀", t: "Aseptic technique assessment", d: "Observational assessment during media fills and routine interventions; repeated after failures, long absence or a change in duties." },
+          { i: "🎓", t: "Training programme", d: "Basic microbiology, hygiene, gowning, aseptic behaviour and relevant SOPs — competence-based, documented, with retraining on change." },
+          { i: "🧴", t: "Hand hygiene", d: "Approved disinfectants with validated contact time, a defined number of applications, and gloved-hand disinfection at defined process points." },
+          { i: "📈", t: "Trending and feedback", d: "Trend personnel monitoring, gowning failures and EM results; retrain individuals before re-entry where failures repeat." }
+        ],
+        note: "Personnel monitoring is a training tool, not a punishment tool. Frame it as early warning of technique drift."
+      },
+      {
+        k: "compare",
+        title: "Personnel entry vs <em>material entry</em>",
+        lead: "Both flows must be defined, controlled and documented — and they must never share the same route in opposite directions.",
+        a: {
+          h: "Personnel entry", badge: "PEOPLE",
+          items: [
+            "Change-room sequence: outer → Grade C → Grade B, with interlocked airlocks and one person at a time in Grade B change rooms.",
+            "Gown qualification before first entry and periodically afterwards, with records held by the training and QA functions.",
+            "Hand and glove disinfection at every stage and at defined process points, using validated disinfectants.",
+            "Behaviour rules enforced in the critical zone: slow movement, no reaching over open product, immediate reporting of breaches."
+          ]
+        },
+        b: {
+          h: "Material & component entry", badge: "MATERIAL",
+          items: [
+            "Transfer through interlocked pass-through hatches or airlocks — the two doors are never open at the same time.",
+            "Outer packaging removed in lower-grade areas; surfaces wiped or sprayed with validated disinfectant before transfer.",
+            "Sterilised components (vials, stoppers, caps) protected by sterile packaging and transferred to Grade A by a validated route.",
+            "Materials intended for Grade A/B must be non-shedding and cleanable — cardboard and wood are excluded entirely."
+          ]
+        },
+        note: "A useful audit question: can you show the transfer route on a drawing, and the disinfectant contact time for each material type?"
+      }
+    ]
+  },
+  /* ------------------------------------------------------------------ 04 */
+  {
+    id: "cross-contamination",
+    num: "04",
+    icon: "🛡️",
+    accent: "#ff5c7a",
+    title: "Cross-Contamination & Contamination Control",
+    short: "How one product, material or organism reaches another — and the segregation, cleaning and strategy that stop it.",
+    tags: ["CCS", "Segregation", "Cleaning validation"],
+    aim: "Recognise the ways contamination transfers between products and areas, and apply segregation, containment, validated cleaning and the CCS to prevent it.",
+    outline: [
+      "Definitions: cross-contamination and related risks",
+      "Sources: people, air, water, equipment, materials",
+      "Segregation, dedicated facilities and campaigns",
+      "Cleaning validation and carry-over limits",
+      "The Contamination Control Strategy (CCS)"
+    ],
+    note: "This module ties the previous three together: design, people and air are the inputs; the CCS is the documented output.",
+    slides: [
+      {
+        k: "bullets",
+        title: "Cross-contamination: the <em>definitions</em>",
+        lead: "Precision matters here — 'contamination', 'cross-contamination' and 'mix-up' have different meanings and different controls.",
+        items: [
+          { t: "Cross-contamination", d: "Contamination of a starting material, intermediate or finished product by another material or product — the main driver of dedicated-facility and campaign requirements." },
+          { t: "Microbial contamination", d: "Introduction of bacteria, yeasts or moulds into a product or a critical area; the focus of aseptic processing controls and environmental monitoring." },
+          { t: "Particulate and foreign matter", d: "Physical particles — glass, metal, fibres, cardboard dust, skin — which are also patient-safety hazards." },
+          { t: "Chemical residues", d: "Cleaning agents, disinfectants and previous product residues left on shared equipment or surfaces." },
+          { t: "Mix-up and mislabelling", d: "Loss of identity of materials or products; requires segregation, labelling, line clearance and status controls." },
+          { t: "Two objectives, one strategy", d: "Protect the product from contamination and contain hazardous product away from operators and the environment — both are covered in the CCS." }
+        ],
+        note: "Warn against treating these as synonyms: segregation requirements, cleaning validation and EM all depend on which risk you are controlling."
+      },
+      {
+        k: "cards",
+        title: "Where contamination <em>comes from</em>",
+        lead: "Contamination is generated internally far more often than it enters from outside — and every source needs its own control.",
+        cards: [
+          { i: "🧍", t: "Personnel", d: "Skin, hair, breath and clothing — the largest single source, controlled by gowning, behaviour and monitoring." },
+          { i: "🌬️", t: "Air and HVAC", d: "Unfiltered or badly directed air carries particles and microbes; controlled by HEPA filtration, air changes and pressure cascade." },
+          { i: "💧", t: "Water, steam and gases", d: "Purified water loops can develop biofilm; steam and compressed gases must be qualified and monitored as critical utilities." },
+          { i: "🔧", t: "Equipment and surfaces", d: "Hard-to-clean designs, damaged surfaces and residues retain product and organisms; cleaning validation proves removal." },
+          { i: "📦", t: "Materials and packaging", d: "Cardboard, pallets, outer packaging and raw materials bring particulates, fibres and bioburden into the facility." },
+          { i: "🧪", t: "Cleaning agents", d: "Disinfectants and detergents can themselves contaminate or leave residues if the procedure is not validated." },
+          { i: "🐜", t: "Facility failures and pests", d: "Leaks, blocked drains, moisture, cracks and pest activity create uncontrolled contamination reservoirs." },
+          { i: "🧫", t: "The product itself", d: "Powders, aerosols and dusts generated by one process can travel to another area; containment and exhaust limit this." }
+        ],
+        note: "Map the eight sources to the room the audience works in, and let them name a control for each one."
+      },
+      {
+        k: "bullets",
+        two: true,
+        title: "Segregation, dedication and <em>campaigns</em>",
+        lead: "For high-risk products the answer is physical separation; where full dedication is not practical, campaigns with validated changeover are used.",
+        items: [
+          { t: "Dedicated facilities", d: "Mandatory for penicillin and beta-lactams; expected for cytotoxics, hormones, live organisms and highly sensitising products — with separate air handling and exhaust to atmosphere." },
+          { t: "Campaign production", d: "Time-based campaigns with validated cleaning between products and defined, documented changeover acceptance criteria." },
+          { t: "Airborne separation", d: "Separate AHUs, no recirculation between product groups, negative pressure with directional flow for hazardous areas, HEPA filtration of exhaust air." },
+          { t: "Personnel segregation", d: "Operators in high-hazard areas do not enter other production areas without re-gowning; dedicated garments and tools where required." },
+          { t: "Equipment segregation", d: "Dedicated or single-use equipment for high-risk products; shared equipment requires validated cleaning and documented changeover." },
+          { t: "Physical segregation", d: "Walls, doors, airlocks and separate routes prevent both airborne and contact transfer between product groups." }
+        ],
+        note: "Explain that dedication is a risk decision supported by data — toxicology, exposure limits and cleaning validation results."
+      },
+      {
+        k: "bullets",
+        title: "Cleaning validation and <em>carry-over limits</em>",
+        lead: "Cleaning is a process, so it is validated like any other: defined parameters, acceptance criteria, sampling and documented evidence.",
+        items: [
+          { t: "Validated cleaning procedure", d: "Defined agent, concentration, contact time, temperature, mechanical action and rinse sequence — with the worst case (worst product, worst equipment location) selected for validation." },
+          { t: "Acceptance limits", d: "Health-based exposure limits first, then the classic criteria: 1/1000 of the minimum therapeutic dose, 10 ppm residue and visually clean — the most stringent applies." },
+          { t: "MACO calculation", d: "Maximum Allowable Carry-Over is calculated per equipment train and product pair, documented, and used to define the cleaning limit." },
+          { t: "Sampling strategy", d: "Swabs for hard-to-reach, worst-case locations plus rinse water samples; recovery is validated for the analyte and the surface." },
+          { t: "Microbial cleanliness", d: "Cleaning and disinfection are also validated for bioburden reduction; clean and dirty hold times are defined and justified." },
+          { t: "Verification and status labelling", d: "Changeover documentation, equipment status tags, cleaning logs and periodic verification after changes to products, equipment or procedures." }
+        ],
+        call: { i: "🧪", t: "Residue discipline", d: "A cleaning validation is only as strong as its sampling locations. Choose worst-case points that reflect actual product contact and poor accessibility." },
+        note: "Mention visual inspection as a prerequisite: no equipment can pass a swab test if it fails the visual check."
+      },
+      {
+        k: "bullets",
+        title: "The Contamination Control <em>Strategy (CCS)</em>",
+        lead: "Annex 1 requires a single documented strategy that pulls every contamination control into one coherent, risk-based system.",
+        items: [
+          { t: "Covers all contamination sources", d: "Facility and equipment design, personnel, utilities, materials, cleaning, monitoring, plus organisational controls and training." },
+          { t: "Risk-based and lifecycle-driven", d: "Built on risk assessments (FMEA, fault tree, process mapping), reviewed whenever something changes and at defined intervals." },
+          { t: "Technical controls preferred over procedural", d: "Isolators, closed systems, single-use technology and automation outrank procedural controls — and every procedural control needs training and monitoring." },
+          { t: "Defines monitoring and limits", d: "Environmental and personnel monitoring, plus pressure and particle monitoring, with alert and action limits, trending and documented excursion handling." },
+          { t: "Owned by senior quality management", d: "Effectiveness reviewed through KPIs, PQR/APQR, audits and management review — with defined CAPA routes when it underperforms." }
+        ],
+        call: { i: "🔎", t: "Inspection point", d: "The CCS is one of the first documents requested during sterile facility inspections. It must be specific to the site's products and processes — not a generic template." },
+        note: "Close the module with the CCS as the connective tissue: everything covered in modules 1–3 becomes evidence inside the CCS."
+      }
+    ]
+  },
+
+  /* ------------------------------------------------------------------ 05 */
+  {
+    id: "hvac-air-handling",
+    num: "05",
+    icon: "🌬️",
+    accent: "#36cfff",
+    title: "HVAC & Air Handling",
+    short: "How air is filtered, delivered, balanced and monitored to control particles, microbes, humidity and pressure.",
+    tags: ["HEPA / ULPA", "ACH & pressure", "Smoke studies"],
+    aim: "Explain how the HVAC system filters, moves, conditions and monitors air to keep the cleanroom within validated limits at all times.",
+    outline: [
+      "What the HVAC system must deliver",
+      "Air path, filters and components",
+      "Air changes, velocity and pressure cascade",
+      "Airflow patterns, smoke studies and monitoring",
+      "Maintenance, filter integrity and shutdowns"
+    ],
+    note: "HVAC is the 'heart' of a cleanroom: if the air is not right, nothing else in the room can compensate for it.",
+    slides: [
+      {
+        k: "cards",
+        title: "What the HVAC system must <em>do</em>",
+        lead: "The HVAC system is not just air conditioning — it is a contamination control system with six defined duties.",
+        cards: [
+          { i: "🧹", t: "Supply clean air", d: "Filtered air dilutes and removes airborne particles and micro-organisms generated inside the room." },
+          { i: "🔒", t: "Contain contamination", d: "Pressure cascade and directional flow prevent ingress from less clean areas and escape of hazardous material." },
+          { i: "🌡️", t: "Control temperature", d: "Operator comfort inside full gowns (commonly 18–22 °C) plus any product or process requirement." },
+          { i: "💧", t: "Control humidity", d: "Typically 45–60 % RH: high humidity supports microbial growth and corrosion; low humidity increases static and powder movement." },
+          { i: "🫧", t: "Remove local contaminants", d: "Dust extraction, solvent and vapour exhaust, and low-level returns that sweep the floor zone." },
+          { i: "🔔", t: "Provide data and alarms", d: "Pressure, temperature, humidity and airflow data to BMS/EMS with alarms, so excursions are detected rather than discovered." }
+        ],
+        note: "Emphasise that humidity is a microbial control parameter, not just a comfort setting."
+      },
+      {
+        k: "bullets",
+        title: "Components along the <em>air path</em>",
+        lead: "Air travels from intake to exhaust through a defined chain — every element needs maintenance, monitoring and documented evidence.",
+        items: [
+          { t: "Intake and pre-filters (G4 / F7–F9)", d: "Protect the AHU and extend HEPA life; changed on differential pressure or scheduled maintenance." },
+          { t: "Air handling unit (AHU)", d: "Mixing box, heating and cooling coils, humidifier, supply and return fans with variable speed drives, dampers and sensors." },
+          { t: "Terminal HEPA / ULPA filters", d: "EN 1822 H13/H14 (≥ 99.95 % / 99.995 % at MPPS), mounted in the ceiling or in fan filter units with gel or mechanical seals and PAO test ports." },
+          { t: "Ductwork and distribution", d: "Smooth, sealed, non-shedding ducting with balancing dampers; diffusers positioned to create the required airflow pattern over the critical zone." },
+          { t: "Returns and exhaust", d: "Low-level returns sweep the room; hazardous areas exhaust through HEPA filters — never recirculate from hazardous to clean areas." },
+          { t: "Controls, sensors and alarms", d: "Differential pressure transmitters, temperature and humidity sensors, airflow switches and BMS/EMS logging with alarm set points and trend records." }
+        ],
+        note: "Point out the maintenance implication: filter and damper adjustments change room balance, so rebalancing is a documented change."
+      },
+      {
+        k: "table",
+        title: "Air handling <em>numbers to know</em>",
+        lead: "These are the design benchmarks used in discussion and qualification — the site's validated values always take precedence.",
+        head: ["Parameter", "Typical value / requirement", "Why it matters"],
+        rows: [
+          ["Grade A air velocity", "0.45 m/s ± 20 % (0.36–0.54 m/s), unidirectional, measured near the filter face", "Confirms first air sweeps particles away from open product"],
+          ["Air changes per hour", "Grade B commonly 20–40+ ACH; Grade C 20+; Grade D lower — always justified by recovery testing", "Dilutes and removes airborne contamination and drives recovery time"],
+          ["Pressure differentials", "≥ 10 Pa between different grades (commonly 10–15 Pa), cascading from clean to less clean", "Prevents airborne ingress when doors open and during operations"],
+          ["Filter efficiency", "EN 1822 H13/H14; leak-test penetration ≤ 0.01 % for H14-class filters", "The final barrier against particles and micro-organisms"],
+          ["Temperature", "18–22 °C typical, driven by process and operator comfort", "Comfortable operators shed and move less; product stability maintained"],
+          ["Relative humidity", "45–60 % RH typical; tighter for hygroscopic or effervescent products", "Limits microbial growth and static; protects moisture-sensitive product"],
+          ["Recovery time", "Typically 15–20 minutes back to 'at rest' particle limits", "Demonstrates the room cleans itself after people and operations"]
+        ],
+        note: "Expect questions on ACH: it is a design tool, not an acceptance criterion — recovery time is what you qualify."
+      },
+      {
+        k: "bullets",
+        title: "Airflow patterns, smoke studies and <em>monitoring</em>",
+        lead: "Filtration alone is not enough — how the air moves through the room decides whether contamination reaches the product.",
+        items: [
+          { t: "Unidirectional flow in Grade A", d: "Parallel air streams sweep particles away from the critical zone; Grade B provides a clean but turbulent background." },
+          { t: "First-air principle", d: "Nothing sits between the HEPA filter and the exposed product — no equipment, no arms, no hands, no instruments." },
+          { t: "Full filter coverage over critical operations", d: "HEPA coverage over filling points, stopper bowls and open containers, with equipment arranged so air sweeps past rather than around." },
+          { t: "Smoke / airflow visualisation studies", d: "Performed at rest, in operation and with worst-case operator positions; video evidence retained and repeated after layout or equipment changes." },
+          { t: "Continuous monitoring with alarms", d: "Differential pressure monitored continuously; non-viable particle counting throughout Grade A critical processes." },
+          { t: "Documented alarm response", d: "Defined actions when a parameter alarms: stop or complete safely, assess batch impact, notify QA, and raise a deviation when limits are exceeded." }
+        ],
+        note: "If the audience remembers one thing: contamination follows airflow. Show them where their hands sit relative to first air."
+      },
+      {
+        k: "bullets",
+        title: "Maintenance, pitfalls and <em>shutdowns</em>",
+        lead: "A qualified HVAC system stays qualified only if it is maintained, re-tested after change and protected from ad-hoc modifications.",
+        items: [
+          { t: "Filter integrity and replacement", d: "Periodic leak testing (commonly every 6–12 months for Grade A/B), replacement on failure or excessive pressure rise, followed by re-testing and requalification." },
+          { t: "Common design pitfalls", d: "Too few HEPA units, returns placed so air short-circuits, dead legs in ducting, unsealed ceiling joints, particle-shedding duct linings." },
+          { t: "Doors, interlocks and discipline", d: "Self-closing interlocked doors preserve the cascade; propping a door open is a contamination event, not a convenience." },
+          { t: "Shutdown and restart", d: "Validated shutdown and restart procedures, followed by cleaning, disinfection and, where required, requalification before production resumes." },
+          { t: "Cleanroom upkeep", d: "No unauthorised drilling, painting or fixing items to walls and ceilings — every maintenance activity generates particles and must be controlled." },
+          { t: "Measure what you claim", d: "Airflow, differential pressure and filter performance are trended. An unmonitored system cannot be defended in an inspection." }
+        ],
+        note: "A very common finding: maintenance work performed without an impact assessment or without cleaning afterwards."
+      }
+    ]
+  },
+
+  /* ------------------------------------------------------------------ 06 */
+  {
+    id: "environmental-monitoring",
+    num: "06",
+    icon: "🔬",
+    accent: "#a78bfa",
+    title: "Environmental Monitoring",
+    short: "Viable and non-viable monitoring that proves the environment is in control — and what to do when it is not.",
+    tags: ["Annex 1 limits", "EM programme", "Excursions"],
+    aim: "Explain how the environmental monitoring programme demonstrates control, how limits are applied by grade, and how excursions are investigated.",
+    outline: [
+      "Purpose and scope of the EM programme",
+      "Methods: air, surface, personnel, particles",
+      "Recommended viable limits by grade",
+      "Frequency, locations and continuous monitoring",
+      "Excursions, trending, identification and data integrity"
+    ],
+    note: "Stress that environmental monitoring is evidence, not decoration: it is used to release batches and to detect deteriorating control before product is affected.",
+    slides: [
+      {
+        k: "bullets",
+        title: "What environmental monitoring is for",
+        lead: "EM is a documented programme of sampling air, surfaces and personnel to demonstrate that the controlled environment stays within specified limits.",
+        items: [
+          { t: "Two monitoring streams", d: "Non-viable (physical particles, ISO 14644-1) and viable (micro-organisms — bacteria, yeasts, moulds) monitoring run in parallel." },
+          { t: "Primary purposes", d: "Confirm facility control, detect excursions early, trend contamination, verify cleaning and disinfection, and support batch disposition." },
+          { t: "Part of the CCS", d: "Sample locations, frequencies, methods and limits are risk-based outputs of the Contamination Control Strategy." },
+          { t: "Annex 1 expectations", d: "Grade A and B environments are monitored during operation, at the locations of greatest contamination risk — including personnel." },
+          { t: "Defined before production starts", d: "The EM programme, its limits and its response actions are approved and in place before any batch is manufactured." },
+          { t: "Records are data", d: "Plates, counts, incubation records and trend charts are GMP raw data with the same integrity expectations as analytical results." }
+        ],
+        note: "Clarify that EM results are usually not the release specification for a batch, but they are essential evidence in batch disposition decisions."
+      },
+      {
+        k: "cards",
+        title: "Monitoring <em>methods</em>",
+        lead: "Different methods answer different questions: air, surfaces and people all need to be sampled to give a complete picture.",
+        cards: [
+          { i: "🌬️", t: "Active air sampling", d: "A known volume (commonly 1 m³) is drawn through a sieve or slit sampler; the result is expressed as CFU/m³." },
+          { i: "🧫", t: "Settle plates", d: "Passive plates exposed at defined locations for a defined period (commonly up to 4 hours); result expressed as CFU/plate/period." },
+          { i: "🧽", t: "Surface monitoring", d: "Contact plates for flat surfaces and swabs for irregular or hard-to-reach areas; results as CFU/plate or CFU/swab, with identification where needed." },
+          { i: "🧍", t: "Personnel monitoring", d: "Glove prints plus gown plates (chest, forearm); assesses gowning technique and aseptic behaviour during work." },
+          { i: "🔢", t: "Non-viable particle counting", d: "Light-scattering counters for ≥ 0.5 µm and ≥ 5 µm; used for ISO 14644-1 classification and continuous Grade A monitoring." },
+          { i: "⚡", t: "Rapid microbiological methods", d: "Growth-based or alternative rapid methods may be used, provided they are validated and produce comparable limits and trends." },
+          { i: "🌡️", t: "Other critical parameters", d: "Temperature, humidity, differential pressure and airflow — plus water, steam and gas monitoring as utilities." },
+          { i: "🧪", t: "Media and incubation", d: "Tryptic soy / soybean-casein digest agar for bacteria plus malt extract or Sabouraud agar for yeasts and moulds; dual incubation at roughly 30–35 °C and 20–25 °C." }
+        ],
+        note: "Note that a settle plate is not a substitute for active air sampling — each has its own limit and its own meaning in Annex 1."
+      },
+      {
+        k: "table",
+        title: "Recommended viable limits <em>by grade</em>",
+        lead: "Annex 1 gives recommended limits for each grade and method. Sites apply alert and action limits around them and trend all results.",
+        head: ["Grade", "Air sample CFU/m³", "Settle plate CFU/4 h", "Contact plate CFU/plate", "Glove print CFU/glove"],
+        rows: [
+          ["Grade A", "< 1", "< 1", "< 1", "< 1"],
+          ["Grade B", "10", "5", "5", "5"],
+          ["Grade C", "100", "50", "25", "Not defined"],
+          ["Grade D", "200", "100", "50", "Not defined"]
+        ],
+        foot: { n: "Handling results", t: "A limit exceedance is an excursion: confirm or repeat, identify organisms, investigate root cause and assess product impact. An isolated result may be acceptable only when justified by identification and impact assessment." },
+        note: "Common confusion: Grade A limits are '< 1', meaning no growth is acceptable in the tested volume or area."
+      },
+      {
+        k: "bullets",
+        title: "Frequency, locations and <em>continuous monitoring</em>",
+        lead: "Where and when you sample determines whether the programme actually detects problems — risk-based, worst-case locations are essential.",
+        items: [
+          { t: "Risk-based locations", d: "Worst cases: near critical operations and filling points, operator positions, high-traffic routes and hard-to-clean areas." },
+          { t: "Grade A non-viable particles", d: "Continuous monitoring throughout the critical process — an explicit Annex 1 expectation, not an optional enhancement." },
+          { t: "Grade A/B viable monitoring", d: "During critical operations in Grade A, at defined intervals in Grade B, and personnel monitoring during each production session." },
+          { t: "Cleaning and pre-production checks", d: "Sampling after cleaning and disinfection, before production, and at defined points during the shift according to the CCS." },
+          { t: "Alert vs action limits", d: "Alert limits prompt attention and trend review; action limits trigger formal investigation, a deviation and a product impact assessment." },
+          { t: "Consistency and documentation", d: "The same locations, plates, volumes and durations every time, with a documented sampling map, schedule and trained analysts — otherwise trends are meaningless." }
+        ],
+        note: "Ask: are the sampling locations on a drawing? If not, results cannot be compared over time or defended in an inspection."
+      },
+      {
+        k: "bullets",
+        title: "Excursions, investigations and <em>data integrity</em>",
+        lead: "The value of monitoring lies in the response: an excursion that is not investigated converts the programme into paperwork.",
+        items: [
+          { t: "Excursion handling", d: "Repeat or confirm the count, identify the organism, assess affected batches and product, investigate root cause (people, HVAC, cleaning, gowning, materials) and implement CAPA." },
+          { t: "Grade A/B excursions are significant", d: "Assume product may have been exposed; assess whether sterility can be assured, and reject the batch where it cannot." },
+          { t: "Trending", d: "Review EM data by area, grade, shift and operator over time; adverse trends must be investigated before they become excursions." },
+          { t: "Organism identification", d: "Speciation in Grade A/B links contamination to a source — people, water, surfaces, HVAC — and steers the investigation." },
+          { t: "Data integrity", d: "Raw plates, counts and timestamps traceable to the analyst; no back-dating and no convenient transcription; LIMS/EMS records with audit trails." },
+          { t: "Reporting into release", d: "EM results, excursions and investigations are part of batch certification — batches are not released until they are resolved." }
+        ],
+        call: { i: "📈", t: "Early warning", d: "The most useful EM signal is not the excursion — it is the slow upward trend that appears months before it." },
+        note: "Close with the link to deviation management: excursion handling is module 7, and the two modules should be read together."
+      }
+    ]
+  },
+  /* ------------------------------------------------------------------ 07 */
+  {
+    id: "deviations",
+    num: "07",
+    icon: "⚠️",
+    accent: "#ff9f43",
+    title: "Deviations",
+    short: "Capturing, investigating and closing departures from approved standards — before they affect the patient.",
+    tags: ["Investigation", "CAPA", "Batch disposition"],
+    aim: "Describe how departures from approved instructions and standards are captured, investigated, resolved and trended to protect product quality.",
+    outline: [
+      "What counts as a deviation",
+      "Examples from the facility and the lab",
+      "The handling workflow, step by step",
+      "Root cause and investigation tools",
+      "CAPA, batch disposition and trending"
+    ],
+    note: "Frame deviations as a quality tool rather than a blame process — the objective is to find and remove the cause, not the person.",
+    slides: [
+      {
+        k: "bullets",
+        title: "What counts as a <em>deviation</em>",
+        lead: "A deviation is any departure from an approved instruction, procedure, specification or established standard — including planned departures approved in advance.",
+        items: [
+          { t: "Definition", d: "Any departure from an approved instruction, procedure, specification or established standard." },
+          { t: "Two families", d: "Unplanned (unexpected events) and planned (pre-approved, time-limited, justified, with control measures and an expiry date)." },
+          { t: "Connected records", d: "Complaints, out-of-specification or out-of-trend results, EM excursions, incidents and batch-record comments often open a deviation." },
+          { t: "Golden rules", d: "Report immediately, contain the impact, document contemporaneously — and never 'fix' a deviation by rewriting the record." },
+          { t: "Why it matters", d: "Deviations are the earliest signal that a control has failed. Unmanaged deviations are a patient-safety risk and the most common inspection observation." },
+          { t: "Better-than-expected still counts", d: "A result better than expected must also be assessed — it may indicate a measurement error, a wrong material or a specification error." }
+        ],
+        note: "Give the audience permission to raise deviations: a reported deviation is a controlled risk; a hidden one is an uncontrolled risk."
+      },
+      {
+        k: "cards",
+        title: "Examples by <em>area</em>",
+        lead: "Most deviations in a sterile facility cluster around a small number of repeating themes — recognise them and they become predictable.",
+        cards: [
+          { i: "🌬️", t: "Facility and HVAC", d: "Pressure differential below limit, filter leak on testing, prolonged door-open event, temperature or humidity excursion." },
+          { i: "🧍", t: "Personnel", d: "Gowning breach, torn or contaminated glove, unauthorised entry, personnel monitoring above limits, overdue training." },
+          { i: "🔬", t: "EM and QC", d: "Particle or viable excursion in Grade A/B, invalid or contaminated plate, OOS/OOT result, instrument out of calibration." },
+          { i: "⚙️", t: "Equipment and process", d: "Unplanned intervention during filling, fill weight or volume out of range, sterilisation cycle deviation, stoppage with product exposed." },
+          { i: "📦", t: "Materials", d: "Wrong material issued, expired raw material used, missing supplier documentation, transfer hatch not disinfected as required." },
+          { i: "📄", t: "Documentation", d: "Missing signature, incomplete batch record, wrong SOP revision used, illegible or incorrect entry on a GMP record." }
+        ],
+        note: "Ask participants for a recent example from their own area, then classify it — this quickly exposes how people judge severity."
+      },
+      {
+        k: "process",
+        title: "Handling workflow — <em>step by step</em>",
+        lead: "A deviation is handled by following the approved SOP: report, contain, document, assess, investigate, act and close — with QA oversight throughout.",
+        steps: [
+          { t: "Detect and report", d: "Anyone can raise it. Report within the shift in which it is detected, describing exactly what was observed, when and by whom." },
+          { t: "Contain the impact", d: "Stop the operation, quarantine affected product and materials, secure records and samples, and inform the supervisor and QA." },
+          { t: "Document", d: "Open a numbered deviation record: description, timing, area, batch or lot numbers, personnel involved and immediate action taken." },
+          { t: "Classify and assess impact", d: "Critical, major or minor — with an assessment of product quality, patient safety, other batches and regulatory impact." },
+          { t: "Investigate to root cause", d: "Use an appropriate tool and review the evidence: batch records, EM data, maintenance records, calibration and training." },
+          { t: "CAPA and closure", d: "Corrective and preventive actions with owners and dates, an effectiveness check, a QA batch decision, then documented closure and review." }
+        ],
+        note: "Timing is visible in the record: report within the shift, classify quickly and keep the investigation moving — aged deviations are a red flag."
+      },
+      {
+        k: "bullets",
+        two: true,
+        title: "Investigation tools and <em>root cause</em>",
+        lead: "The investigation must reach a defensible root cause — 'operator error' on its own is not an acceptable conclusion.",
+        items: [
+          { t: "5 Whys", d: "Peel back each answer until a systemic cause appears, rather than stopping at the first human action." },
+          { t: "Ishikawa (6M) fishbone", d: "People, machine, method, material, measurement and environment — a systematic sweep for contributing causes." },
+          { t: "Is / Is-not analysis", d: "Compare affected with unaffected batches, lines, shifts and locations to narrow the cause to specific factors." },
+          { t: "Risk tools", d: "FMEA and risk ranking to prioritise, fault tree analysis for complex failures, with severity, occurrence and detectability scoring." },
+          { t: "Challenge human error", d: "Annex 1 expects an assumption of human error to be justified — look for design, workload, training and procedure weaknesses first." },
+          { t: "Evidence and hypothesis testing", d: "Review trends for the same failure, conduct simulation or microbiological testing, and re-sample where appropriate to confirm the hypothesis." }
+        ],
+        note: "A useful test of an investigation: could a new employee read it and re-perform the reasoning that led to the conclusion?"
+      },
+      {
+        k: "bullets",
+        title: "CAPA, batch disposition and <em>trending</em>",
+        lead: "The investigation only delivers value if it changes something permanently and the batch decision is documented and defensible.",
+        items: [
+          { t: "Correction vs corrective vs preventive action", d: "Correction fixes the immediate problem (re-clean, re-test); corrective action prevents recurrence; preventive action stops the same cause affecting other products or areas." },
+          { t: "Batch disposition", d: "QA decides release, reject, reprocess or repack based on the documented impact assessment. No release while a critical deviation remains unresolved." },
+          { t: "Effectiveness checks", d: "Verify the CAPA worked by trending the same failure mode after implementation — ineffective or overdue CAPAs are a frequent inspection finding." },
+          { t: "Escalation and notification", d: "Critical deviations may require health-authority notification, field alert or recall decisions; the rationale must be documented either way." },
+          { t: "KPIs and review", d: "Number of deviations, average age, on-time closure, repeat deviations and CAPA effectiveness — reviewed monthly and in management review." },
+          { t: "Documented timelines", d: "The SOP defines reporting, investigation and closure timelines; prolonged investigations weaken both the science and the audit defence." }
+        ],
+        call: { i: "🎯", t: "Test of a good CAPA", d: "Would this action still prevent the deviation if the same operator, on the same equipment, on the night shift, three years from now, did exactly the same thing?" },
+        note: "Close by linking to regulatory consequences — module 9 covers inspection expectations and findings."
+      }
+    ]
+  },
+
+  /* ------------------------------------------------------------------ 08 */
+  {
+    id: "qc-qa-responsibilities",
+    num: "08",
+    icon: "⚖️",
+    accent: "#4ade80",
+    title: "QC & QA Responsibilities",
+    short: "The system versus the evidence: who owns what, and where the two functions must work together.",
+    tags: ["PQS", "Release", "Independence"],
+    aim: "Draw a clear line — and a clear interface — between Quality Assurance as a system and Quality Control as the laboratory evidence function.",
+    outline: [
+      "QA vs QC: the classic distinction",
+      "Quality Assurance responsibilities",
+      "Quality Control responsibilities",
+      "Independence and release authority",
+      "Shared duties, interfaces and KPIs"
+    ],
+    note: "This module is often used for role clarity in training. Everyone in the room contributes to quality, but accountability differs.",
+    slides: [
+      {
+        k: "bullets",
+        title: "QA vs QC — the <em>classic distinction</em>",
+        lead: "One builds and maintains the system that prevents quality failures; the other generates and interprets the data that proves the system works.",
+        items: [
+          { t: "QA is proactive and system-wide", d: "Designs, maintains and continuously improves the quality system so that quality is built into the product — oversight of everything affecting product quality." },
+          { t: "QC is analytical and evidence-based", d: "Samples, tests and reports on materials and products, and performs the environmental and microbiological testing that proves control." },
+          { t: "Both are independent of production", d: "Neither QA nor QC should report through production management; independence is essential for credible decisions and regulatory compliance." },
+          { t: "Quality is a site-wide responsibility", d: "Production, engineering, warehouse and QC all work inside the system QA maintains — QA supports quality, it does not own it alone." },
+          { t: "Release authority", d: "QA — in many countries through a Qualified Person or Authorised Person — confirms that the batch complies with the marketing authorisation and GMP before release." },
+          { t: "Same objective, different evidence", d: "QA demonstrates control through systems and oversight; QC demonstrates it through measured data." }
+        ],
+        note: "A memorable framing: QA prevents quality problems; QC detects them. Both are needed, and neither can replace the other."
+      },
+      {
+        k: "bullets",
+        title: "Quality Assurance — <em>responsibilities</em>",
+        lead: "QA owns the pharmaceutical quality system: documentation, release decisions, oversight of deviations and validation, and the link to regulators.",
+        items: [
+          { t: "Quality system ownership", d: "SOPs, documentation control, data integrity governance, training system, self-inspection and management review." },
+          { t: "Release and disposition", d: "Review of batch records, QC results, deviations and EM data; certification or release by the QP where applicable; decisions on rejected or returned material." },
+          { t: "Deviations, CAPA and change control", d: "Oversight of investigations, approval of CAPAs, effectiveness checks and assessment of changes with impact on validated status." },
+          { t: "Validation and qualification oversight", d: "Approval of the VMP, protocols and reports, and verification that the validated state is maintained in routine operation." },
+          { t: "Supplier quality and audits", d: "Supplier qualification and audits, quality agreements, complaint handling, returns, recalls and product quality review." },
+          { t: "Inspection readiness and response", d: "Preparing the site for inspections, managing responses to findings, and maintaining the evidence trail for regulators and customers." }
+        ],
+        note: "Mention the Qualified Person where relevant: the QP certifies the batch and is personally accountable in the EU framework."
+      },
+      {
+        k: "bullets",
+        title: "Quality Control — <em>responsibilities</em>",
+        lead: "QC provides the analytical and microbiological evidence: validated methods, qualified instruments and documented results with full data integrity.",
+        items: [
+          { t: "Sampling and testing", d: "Raw materials, packaging materials, in-process samples, bulk and finished product, stability samples, water and utilities." },
+          { t: "Analytical methods", d: "Validated or verified methods (ICH Q2/Q14, pharmacopoeial), method transfer, working standards and reference standard control." },
+          { t: "Microbiology", d: "Environmental monitoring, bioburden, sterility tests, bacterial endotoxins (LAL/BET), water and media QC, isolate identification and growth promotion testing." },
+          { t: "Instrument qualification and calibration", d: "Installation and operation qualification of laboratory instruments, the calibration programme, maintenance and computerised system validation." },
+          { t: "OOS and OOT investigations", d: "Laboratory investigations covering analytical error assessment, retest and re-sample decisions, and documented conclusions." },
+          { t: "Data, records and retention", d: "Raw data, worksheets, LIMS entries, sample retention and documentation — with analytical trends feeding the PQR." }
+        ],
+        note: "Emphasise that QC results are only as good as the sample: sampling plans, containers, transport and holding times are part of the result."
+      },
+      {
+        k: "compare",
+        title: "Independence and the <em>interface</em>",
+        lead: "The two functions must be independent yet tightly connected — the interface between them is where many quality system failures occur.",
+        a: {
+          h: "QA", badge: "QUALITY ASSURANCE",
+          items: [
+            "Approves SOPs, specifications, validation protocols and reports",
+            "Owns deviation, CAPA and change control systems",
+            "Reviews and authorises batch release, rejection or reprocessing",
+            "Runs self-inspection, supplier audits and inspection readiness",
+            "Approves QC laboratory investigations after review"
+          ]
+        },
+        b: {
+          h: "QC", badge: "QUALITY CONTROL",
+          items: [
+            "Generates and signs the primary analytical and microbiological data",
+            "Performs laboratory investigations for OOS/OOT, EM excursions and invalid results",
+            "Maintains instrument qualification, calibration and method validation",
+            "Notifies QA immediately of OOS results, EM excursions or invalid data",
+            "Supports the PQR with testing data and analytical trend evaluations"
+          ]
+        },
+        note: "Note the one-way information flow: QC data must reach QA quickly and without editing, or release decisions are made on partial information."
+      },
+      {
+        k: "table",
+        title: "Shared duties — <em>who does what</em>",
+        lead: "Many critical activities need both functions. Clarity about the split prevents gaps and duplicated effort.",
+        head: ["Activity", "Quality Assurance", "Quality Control"],
+        rows: [
+          ["Batch record and disposition", "Reviews the record and certifies release or rejection", "Provides results, data and follow-up on investigations"],
+          ["Environmental monitoring", "Trends results, investigates excursions, approves CAPA", "Samples, incubates, counts, identifies organisms and reports"],
+          ["Deviations and OOS/OOT", "Oversees the process, approves classification and closure", "Performs the laboratory investigation and supports root cause"],
+          ["Validation and qualification", "Oversees the VMP and approves protocols and reports", "Validates methods, qualifies instruments and tests samples"],
+          ["Audits and inspections", "Internal audits, supplier audits and inspection management", "Laboratory compliance, method adherence and data integrity"],
+          ["Trending and PQR/APQR", "Owns the PQR, KPI review and management review", "Supplies analytical, EM, stability and utility trends"]
+        ],
+        foot: { n: "Principle", t: "QA owns the system, QC owns the data, and both are accountable for the integrity of the record that connects them." },
+        note: "If your site has overlapping roles, document the split in an SOP or quality agreement — ambiguity is what inspectors probe."
+      }
+    ]
+  },
+
+  /* ------------------------------------------------------------------ 09 */
+  {
+    id: "regulatory-requirements",
+    num: "09",
+    icon: "📜",
+    accent: "#f472b6",
+    title: "Regulatory Requirements",
+    short: "The GMP framework for cleanrooms and sterile manufacture — and what inspectors actually ask for.",
+    tags: ["Annex 1 (2022)", "21 CFR 211", "ISO / ICH"],
+    aim: "Map the regulations and standards governing cleanrooms and sterile manufacturing, and understand how compliance is inspected and enforced.",
+    outline: [
+      "The regulatory framework at a glance",
+      "EU GMP references that matter here",
+      "US FDA and international standards",
+      "What Annex 1 (2022) changed",
+      "Inspections, findings and consequences"
+    ],
+    note: "Close the presentation here: everything in modules 1–8 exists because these documents require it, and this is how compliance is verified.",
+    slides: [
+      {
+        k: "bullets",
+        title: "The regulatory <em>framework</em> at a glance",
+        lead: "Four layers work together: legislation, GMP guidance with product-specific annexes, technical standards, and pharmacopoeial test methods.",
+        items: [
+          { t: "GMP is the baseline requirement", d: "EU GMP (Directive 2003/94/EC and EudraLex Volume 4), US 21 CFR Parts 210 and 211, plus equivalent national GMP regulations worldwide." },
+          { t: "Annexes add product-specific detail", d: "Annex 1 (sterile), Annex 2 (biological products), Annex 11 (computerised systems) and Annex 15 (qualification and validation)." },
+          { t: "Standards give the technical methods", d: "ISO 14644 (cleanrooms), ISO 13408 (aseptic processing), EN 1822 (filter classification) and ISO 14971 (risk management)." },
+          { t: "ICH provides the quality thinking", d: "Q7 (APIs), Q9 (quality risk management), Q10 (pharmaceutical quality system) and Q2/Q14 (analytical procedures)." },
+          { t: "Pharmacopoeias define testing", d: "EP, USP and JP monographs and general chapters for sterility, endotoxins, microbial limits and water quality." },
+          { t: "Global convergence", d: "PIC/S, WHO and national agencies increasingly align expectations — design for the strictest applicable requirement." }
+        ],
+        note: "Useful slide to reference the audience's own market: EU, US, India (Schedule M) or WHO-prequalified supply."
+      },
+      {
+        k: "table",
+        title: "EU GMP references that <em>matter here</em>",
+        lead: "These are the documents most frequently cited in sterile facility inspections and in the design of the systems covered in this deck.",
+        head: ["Document", "What it covers", "Why it matters for us"],
+        rows: [
+          ["Annex 1 — Manufacture of Sterile Medicinal Products (2022 revision, effective 25 Aug 2023)", "Contamination Control Strategy, cleanroom grades, gowning, EM, barrier technology, personnel monitoring, aseptic process simulation (media fills)", "The primary sterile manufacturing guidance — replaced the 2008 Annex 1 with much stronger expectations on CCS and risk management"],
+          ["Chapter 3 — Premises and Equipment", "Design, layout, segregation, dedicated facilities, drainage, repair, lighting and washing facilities", "Sets the facility design and separation requirements for all dosage forms"],
+          ["Annex 15 — Qualification and Validation", "VMP, DQ/IQ/OQ/PQ, change control and the validation lifecycle", "Defines how cleanroom, HVAC and utility qualification must be documented"],
+          ["Annex 11 — Computerised Systems", "Validation, security, access control, audit trails and data integrity", "Applies to BMS/EMS, LIMS and automated manufacturing equipment"],
+          ["Chapters 1 and 6 — PQS and Quality Control", "Pharmaceutical quality system, self-inspection, sampling and testing", "Defines the QA/QC structure, product quality review and laboratory expectations"],
+          ["Chapters 4 and 5 — Documentation and Production", "Records, batch documentation, prevention of cross-contamination and changeover", "Documentation and changeover discipline inspectors audit in every batch"]
+        ],
+        foot: { n: "Note", t: "Annex 1 also links to Annexes 2, 11, 13, 15 and 17 — sterile facilities are inspected against the whole annex set, not a single document." },
+        note: "Encourage the audience to keep the current revision locally available — being inspected against a superseded version is a common and avoidable finding."
+      },
+      {
+        k: "table",
+        title: "US FDA and other <em>authorities</em>",
+        lead: "Regulations differ in structure but converge on the same technical expectations — contamination control, qualification, monitoring and documentation.",
+        head: ["Reference", "Key content"],
+        rows: [
+          ["21 CFR 210 and 211", "US cGMP for finished pharmaceuticals: facilities, personnel, equipment and records; 211.42(d) requires separate facilities for penicillin"],
+          ["FDA guidance — sterile drug products produced by aseptic processing (2004)", "Design, HVAC, personnel, media fills and environmental monitoring expectations for aseptic processing"],
+          ["21 CFR Part 11", "Electronic records and electronic signatures: validation, audit trails and access control"],
+          ["WHO guidance (for example TRS 1044 Annex 2; TRS 961 Annex 6)", "International GMP guidance for sterile products, used by many national authorities and for prequalification"],
+          ["ISO 14644 series", "Classification (Part 1), test methods (Part 3), design, construction and start-up (Part 4), and cleanroom operations (Part 2)"],
+          ["ISO 13408-1 and 13408-5, EN 1822", "Aseptic processing of health care products; HEPA and ULPA filter classification and testing"],
+          ["USP general chapters (1116, 1151, 797) and national GMP (for example Schedule M)", "Microbial control and EM, air handling terminology, compounding standards and national annexes"]
+        ],
+        note: "Highlight the practical difference: EU GMP gives explicit grade limits, while the FDA approach relies on guidance plus cGMP regulation — both must be satisfied for global supply."
+      },
+      {
+        k: "bullets",
+        title: "Annex 1 (2022) — what <em>changed</em>",
+        lead: "The 2022 revision raised expectations in seven areas that directly shape the systems described in this presentation.",
+        items: [
+          { t: "Contamination Control Strategy is mandatory", d: "A documented, holistic, site-wide CCS covering all contamination sources — one of the most significant new requirements." },
+          { t: "Barrier technology is preferred", d: "Isolators and RABS for aseptic processing, with only justified, risk-assessed interventions in the critical zone." },
+          { t: "Personnel control is strengthened", d: "Gown qualification, aseptic behaviour assessment, personnel monitoring, and limits on the number and time of personnel in critical areas." },
+          { t: "Continuous particle monitoring in Grade A", d: "Non-viable particle monitoring throughout the critical process, plus viable monitoring before and during production as defined in the CCS." },
+          { t: "Quality risk management is embedded everywhere", d: "Risk assessments for design, processes, interventions and monitoring — and human error assumptions must be justified." },
+          { t: "Aseptic process simulation is explicit", d: "Initial and periodic media fills with worst-case interventions, defined acceptance criteria and mandatory investigation of positives." },
+          { t: "Utilities and single-use systems", d: "Water, steam, gases and single-use assemblies must be qualified, monitored and integrated into the CCS." }
+        ],
+        note: "If asked about dates: the revision was published in August 2022 and became effective on 25 August 2023. Confirm the current position with your authority for any transitional points."
+      },
+      {
+        k: "bullets",
+        title: "Inspections, findings and <em>consequences</em>",
+        lead: "Compliance is verified by inspectors who examine records, facilities and data — and the outcome ranges from an observation to a licence suspension.",
+        items: [
+          { t: "Types of inspection", d: "Pre-approval, routine or surveillance, for-cause and follow-up inspections by FDA, EMA and national agencies — plus customer and certification audits." },
+          { t: "What inspectors ask to see", d: "The CCS, EM data and trends, deviations and CAPAs, qualification and validation reports, training and gowning records, cleanroom drawings and HVAC data." },
+          { t: "Common observations", d: "Inadequate CCS, EM excursions not properly investigated, gowning or monitoring failures, filter integrity and DP monitoring gaps, data integrity issues and overdue CAPAs." },
+          { t: "Consequences", d: "Form 483 observations, warning letters, import alerts, suspension or withdrawal of GMP certificates and licences, batch recalls and significant remediation costs." },
+          { t: "Staying compliant", d: "Gap assessments against new guidance, a formal CAPA programme, change control, continuous training, self-inspection and proactive trend and KPI review." },
+          { t: "Documentation discipline", d: "If it is not documented, it did not happen. Inspection readiness is a daily operating practice, not a pre-audit sprint." }
+        ],
+        call: { i: "🏁", t: "Closing thought", d: "Cleanrooms are not clean because of the equipment alone — they stay clean because people, design, monitoring and documentation work together as one documented system." },
+        note: "End by returning to the main page and inviting questions on any module — the deck is designed to be re-opened by topic."
+      }
+    ]
+  }
+];
+</script>
+<script>
+/* =====================================================================
+   DECK ENGINE — routing, rendering and presentation controls
+   ===================================================================== */
+(function () {
+  "use strict";
+
+  var $ = function (sel, root) { return (root || document).querySelector(sel); };
+  var ESCMAP = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+  var esc = function (v) { return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) { return ESCMAP[c]; }); };
+
+  var homeEl = $("#home");
+  var deckEl = $("#deck");
+  var stageEl = $("#stage");
+  var gridEl = $("#topicGrid");
+  var dotsEl = $("#dots");
+  var notesPanel = $("#notesPanel");
+  var notesText = $("#notesText");
+  var jumpEl = $("#jump");
+  var jumpGrid = $("#jumpGrid");
+
+  /* ---------------- helpers ---------------- */
+  function slidesOf(m) {
+    return [{
+      k: "intro",
+      title: m.title,
+      lead: m.aim,
+      outline: m.outline,
+      tags: m.tags,
+      note: m.note
+    }].concat(m.slides);
+  }
+  function indexOfId(id) {
+    for (var i = 0; i < MODULES.length; i++) { if (MODULES[i].id === id) return i; }
+    return -1;
+  }
+  function pad(n) { return (n < 10 ? "0" : "") + n; }
+
+  var TOTAL_SLIDES = MODULES.reduce(function (n, m) { return n + slidesOf(m).length; }, 0);
+
+  /* ---------------- slide bodies ---------------- */
+  function bulletsHTML(s) {
+    var cls = "bullets" + (s.two ? " two" : "");
+    var items = (s.items || []).map(function (it, i) {
+      var num = pad(i + 1);
+      if (typeof it === "string") {
+        return '<div class="bullet"><span class="mark">' + num + '</span><div class="txt">' + esc(it) + "</div></div>";
+      }
+      return '<div class="bullet"><span class="mark">' + num + '</span><div class="txt">' +
+        '<span class="lbl">' + esc(it.t) + "</span>" +
+        (it.d ? '<span class="desc">' + esc(it.d) + "</span>" : "") +
+        "</div></div>";
+    }).join("");
+    return '<div class="' + cls + '">' + items + "</div>";
+  }
+
+  function tableHTML(s) {
+    var head = (s.head || []).map(function (h) { return "<th>" + esc(h) + "</th>"; }).join("");
+    var rows = (s.rows || []).map(function (r) {
+      return "<tr>" + r.map(function (c) { return "<td>" + esc(c) + "</td>"; }).join("") + "</tr>";
+    }).join("");
+    return '<div class="table-wrap"><table><thead><tr>' + head + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+  }
+
+  function cardsHTML(s) {
+    var cards = (s.cards || []).map(function (c) {
+      return '<div class="card">' +
+        (c.i ? '<div class="ci">' + esc(c.i) + "</div>" : "") +
+        "<h4>" + esc(c.t) + "</h4>" +
+        (c.d ? "<p>" + esc(c.d) + "</p>" : "") +
+        "</div>";
+    }).join("");
+    return '<div class="cards">' + cards + "</div>";
+  }
+
+  function processHTML(s) {
+    var steps = (s.steps || []).map(function (st, i) {
+      var title = String(st.t).replace(/^\s*\d+\s*[—–-]\s*/, "");
+      return '<div class="pstep"><div class="n">' + pad(i + 1) + "</div>" +
+        "<h4>" + esc(title) + "</h4>" +
+        (st.d ? "<p>" + esc(st.d) + "</p>" : "") +
+        "</div>";
+    }).join("");
+    return '<div class="process">' + steps + "</div>";
+  }
+
+  function statsHTML(s) {
+    var stats = (s.stats || []).map(function (st) {
+      return '<div class="stat"><div class="v">' + esc(st.v) +
+        (st.u ? '<span class="u">' + esc(st.u) + "</span>" : "") +
+        '</div><div class="l">' + esc(st.l) + "</div></div>";
+    }).join("");
+    return '<div class="stats">' + stats + "</div>";
+  }
+
+  function compareHTML(s) {
+    function panel(p, cls) {
+      var items = (p.items || []).map(function (it) { return "<li>" + esc(it) + "</li>"; }).join("");
+      return '<div class="panel ' + cls + '"><h4><span class="badge">' + esc(p.badge) + "</span>" + esc(p.h) +
+        "</h4><ul>" + items + "</ul></div>";
+    }
+    return '<div class="compare">' + panel(s.a, "a") + panel(s.b, "b") + "</div>";
+  }
+
+  function introHTML(s, m) {
+    var list = (s.outline || []).map(function (o, i) {
+      return '<div class="oi"><span class="num">' + pad(i + 1) + "</span><span>" + esc(o) + "</span></div>";
+    }).join("");
+    return '<div class="outline">' + list + "</div>" +
+      '<div class="callout" style="margin-top:18px"><span class="ci">🎯</span><div>' +
+      "<h4>How to use this module</h4>" +
+      "<p>Use the <b>Next</b> button or the arrow keys to move through the slides. Press <b>G</b> for the slide index of this module, " +
+      "<b>N</b> for speaker notes, and <b>Esc</b> to return to the main topic page.</p></div></div>";
+  }
+
+  function bodyHTML(s, m) {
+    switch (s.k) {
+      case "intro": return introHTML(s, m);
+      case "table": return tableHTML(s);
+      case "cards": return cardsHTML(s);
+      case "process": return processHTML(s);
+      case "stats": return statsHTML(s);
+      case "compare": return compareHTML(s);
+      default: return bulletsHTML(s);
+    }
+  }
+
+  function slideHTML(s, m, moduleSlideNo) {
+    var tag = s.k === "intro"
+      ? "Module " + m.num + " · Overview · " + moduleSlideNo + " of " + slidesOf(m).length
+      : "Module " + m.num + " · " + m.title;
+    var chips = (s.tags || []).map(function (t) { return '<span class="chip">' + esc(t) + "</span>"; }).join(" ");
+    return '<article class="slide">' +
+      '<div class="slide-tag">' + esc(tag) + "</div>" +
+      "<h2>" + s.title + "</h2>" +
+      (s.lead ? '<p class="s-lead">' + esc(s.lead) + "</p>" : "") +
+      (chips ? '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">' + chips + "</div>" : "") +
+      '<div class="s-body">' + bodyHTML(s, m) + "</div>" +
+      (s.call ? '<div class="callout" style="margin-top:18px"><span class="ci">' + esc(s.call.i) +
+        "</span><div><h4>" + esc(s.call.t) + "</h4><p>" + esc(s.call.d) + "</p></div></div>" : "") +
+      (s.foot ? '<div class="footnote"><span class="fi">📌</span><div><b>' + esc(s.foot.n) +
+        ":</b> " + esc(s.foot.t) + "</div></div>" : "") +
+      "</article>";
+  }
+
+  /* ---------------- state ---------------- */
+  var cur = { m: -1, s: 0, dir: 1 };
+
+  function render(opts) {
+    opts = opts || {};
+    var m = MODULES[cur.m];
+    var list = slidesOf(m);
+    var s = list[cur.s];
+
+    var article = slideHTML(s, m, cur.s + 1);
+    article = article.replace('class="slide"', 'class="slide' + (opts.back ? " back" : "") + '"');
+    stageEl.innerHTML = article;
+    stageEl.scrollTop = 0;
+
+    // top bar
+    $("#deckTopicTitle").textContent = m.title;
+    $("#deckTopicSub").textContent = "Module " + m.num + " of " + pad(MODULES.length);
+    $("#topicDot").style.background = m.accent;
+    $("#topicDot").style.boxShadow = "0 0 12px " + m.accent;
+    $("#slideNow").textContent = cur.s + 1;
+    $("#slideTotal").textContent = list.length;
+    $("#progressBar").style.width = (((cur.s + 1) / list.length) * 100) + "%";
+
+    // notes
+    notesText.textContent = s.note || "No speaker notes for this slide.";
+
+    // nav buttons
+    $("#btnPrev").disabled = (cur.s === 0);
+    var last = (cur.s === list.length - 1);
+    var veryLast = last && (cur.m === MODULES.length - 1);
+    $("#btnNext").style.display = last ? "none" : "";
+    $("#btnNextTopic").style.display = last ? "" : "none";
+    $("#btnNextTopic").textContent = veryLast ? "Back to main page →" : "Next module →";
+
+    // dots
+    Array.prototype.forEach.call(dotsEl.children, function (d, i) {
+      d.classList.toggle("on", i === cur.s);
+      if (i === cur.s && d.scrollIntoView) { d.scrollIntoView({ block: "nearest", inline: "center" }); }
+    });
+
+    document.title = m.title + " · Slide " + (cur.s + 1) + "/" + list.length + " · Cleanroom GMP";
+  }
+
+  function buildDots() {
+    var list = slidesOf(MODULES[cur.m]);
+    dotsEl.innerHTML = list.map(function (sl, i) {
+      var label = sl.k === "intro" ? "Overview" : String(sl.title).replace(/<[^>]+>/g, "");
+      return '<button class="dot-btn" data-i="' + i + '" title="' + esc(i + 1 + ". " + label) + '"></button>';
+    }).join("");
+  }
+
+  function openModule(mi, si, back) {
+    cur.m = mi;
+    var list = slidesOf(MODULES[mi]);
+    cur.s = Math.max(0, Math.min(si == null ? 0 : si, list.length - 1));
+    document.documentElement.style.setProperty("--accent", MODULES[mi].accent);
+    homeEl.classList.remove("on");
+    deckEl.classList.add("on");
+    buildDots();
+    render({ back: !!back });
+    jumpEl.classList.remove("on");
+  }
+
+  function showHome() {
+    deckEl.classList.remove("on");
+    homeEl.classList.add("on");
+    document.title = "Pharmaceutical Cleanroom & GMP — Interactive Presentation";
+  }
+
+  function setHash(mi, si) {
+    location.hash = "#/" + MODULES[mi].id + "/" + (si + 1);
+  }
+
+  function next() {
+    var list = slidesOf(MODULES[cur.m]);
+    if (cur.s < list.length - 1) { setHash(cur.m, cur.s + 1); }
+    else if (cur.m < MODULES.length - 1) { setHash(cur.m + 1, 0); }
+    else { location.hash = ""; }
+  }
+  function prev() {
+    if (cur.s > 0) { setHash(cur.m, cur.s - 1); }
+    else { location.hash = ""; }
+  }
+
+  /* ---------------- routing ---------------- */
+  function route() {
+    var h = location.hash.replace(/^#\/?/, "");
+    if (!h) { showHome(); return; }
+    var parts = h.split("/");
+    var mi = indexOfId(parts[0]);
+    if (mi < 0) { showHome(); return; }
+    var si = parts[1] ? (parseInt(parts[1], 10) - 1) : 0;
+    var back = (cur.m === mi && si < cur.s);
+    openModule(mi, si, back);
+  }
+  window.addEventListener("hashchange", route);
+
+  /* ---------------- main page ---------------- */
+  function buildHome() {
+    gridEl.innerHTML = MODULES.map(function (m, i) {
+      var n = slidesOf(m).length;
+      return '<button class="tile" style="--a:' + m.accent + ';animation-delay:' + (i * 55) + 'ms" data-mi="' + i + '">' +
+        '<span class="tile-top"><span class="tile-icon">' + esc(m.icon) + '</span><span class="tile-num">' + m.num + "</span></span>" +
+        '<span class="tile-h">' + esc(m.title) + "</span>" +
+        '<span class="tile-p">' + esc(m.short) + "</span>" +
+        '<span class="tile-foot"><span class="count">' + n + " SLIDES</span>" +
+        '<span class="go">Open deck <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12 5l7 7-7 7"/></svg></span></span>' +
+        "</button>";
+    }).join("");
+    var first = MODULES[0];
+    $("#chipModules").textContent = MODULES.length;
+    $("#chipSlides").textContent = TOTAL_SLIDES;
+    void first;
+  }
+
+  gridEl.addEventListener("click", function (e) {
+    var tile = e.target.closest(".tile");
+    if (!tile) return;
+    location.hash = "#/" + MODULES[+tile.dataset.mi].id + "/1";
+  });
+
+  $("#startFirst").addEventListener("click", function () { location.hash = "#/" + MODULES[0].id + "/1"; });
+  $("#printHome").addEventListener("click", function () { window.print(); });
+
+  /* ---------------- deck controls ---------------- */
+  $("#btnHome").addEventListener("click", function () { location.hash = ""; });
+  $("#btnPrev").addEventListener("click", prev);
+  $("#btnNext").addEventListener("click", next);
+  $("#btnNextTopic").addEventListener("click", function () {
+    if (cur.m < MODULES.length - 1) { setHash(cur.m + 1, 0); } else { location.hash = ""; }
+  });
+
+  dotsEl.addEventListener("click", function (e) {
+    var d = e.target.closest(".dot-btn");
+    if (!d) return;
+    setHash(cur.m, +d.dataset.i);
+  });
+
+  $("#btnNotes").addEventListener("click", function () {
+    notesPanel.classList.toggle("on");
+  });
+
+  $("#btnFull").addEventListener("click", function () {
+    if (!document.fullscreenElement) {
+      if (document.documentElement.requestFullscreen) { document.documentElement.requestFullscreen(); }
+    } else if (document.exitFullscreen) { document.exitFullscreen(); }
+  });
+
+  function buildJump() {
+    jumpGrid.innerHTML = MODULES.map(function (m, mi) {
+      var items = slidesOf(m).map(function (sl, si) {
+        var label = sl.k === "intro" ? "Module overview" : String(sl.title).replace(/<[^>]+>/g, "");
+        return '<button class="jump-item" style="--a:' + m.accent + '" data-mi="' + mi + '" data-si="' + si + '">' +
+          "<b>" + esc(m.num + "." + pad(si + 1) + " · " + label) + "</b>" +
+          "<span>" + esc(m.title) + "</span></button>";
+      }).join("");
+      return (cur.m === mi ? "" : "") + items;
+    }).join("");
+  }
+  $("#btnJump").addEventListener("click", function () {
+    buildJump();
+    jumpEl.classList.add("on");
+  });
+  jumpEl.addEventListener("click", function (e) {
+    if (e.target === jumpEl) { jumpEl.classList.remove("on"); return; }
+    var it = e.target.closest(".jump-item");
+    if (!it) return;
+    location.hash = "#/" + MODULES[+it.dataset.mi].id + "/" + (+it.dataset.si + 1);
+  });
+
+  /* ---------------- keyboard ---------------- */
+  document.addEventListener("keydown", function (e) {
+    var deckOpen = deckEl.classList.contains("on");
+    if (!deckOpen) {
+      if (e.key === "Enter" || e.key === "1") { /* tiles handle their own activation */ }
+      return;
+    }
+    if (e.key === "Escape") {
+      if (jumpEl.classList.contains("on")) { jumpEl.classList.remove("on"); }
+      else if (document.fullscreenElement && document.exitFullscreen) { document.exitFullscreen(); }
+      else { location.hash = ""; }
+      return;
+    }
+    var k = e.key;
+    if (k === "ArrowRight" || k === "PageDown" || k === " " || k === "Enter") { e.preventDefault(); next(); }
+    else if (k === "ArrowLeft" || k === "PageUp") { e.preventDefault(); prev(); }
+    else if (k === "Home") { e.preventDefault(); setHash(cur.m, 0); }
+    else if (k === "End") { e.preventDefault(); setHash(cur.m, slidesOf(MODULES[cur.m]).length - 1); }
+    else if (k === "g" || k === "G") { buildJump(); jumpEl.classList.toggle("on"); }
+    else if (k === "n" || k === "N") { notesPanel.classList.toggle("on"); }
+    else if (k === "f" || k === "F") {
+      if (!document.fullscreenElement) { if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
+      else if (document.exitFullscreen) { document.exitFullscreen(); }
+    }
+  });
+
+  /* ---------------- touch swipe ---------------- */
+  var touchX = null, touchY = null;
+  stageEl.addEventListener("touchstart", function (e) {
+    touchX = e.changedTouches[0].clientX; touchY = e.changedTouches[0].clientY;
+  }, { passive: true });
+  stageEl.addEventListener("touchend", function (e) {
+    if (touchX === null) return;
+    var dx = e.changedTouches[0].clientX - touchX;
+    var dy = e.changedTouches[0].clientY - touchY;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.5) { dx < 0 ? next() : prev(); }
+    touchX = touchY = null;
+  }, { passive: true });
+
+  /* ---------------- print: every slide of the current module ---------------- */
+  var savedHTML = null;
+  window.addEventListener("beforeprint", function () {
+    if (!deckEl.classList.contains("on")) return;
+    var m = MODULES[cur.m];
+    savedHTML = stageEl.innerHTML;
+    stageEl.innerHTML = slidesOf(m).map(function (s, i) { return slideHTML(s, m, i + 1); }).join("");
+  });
+  window.addEventListener("afterprint", function () {
+    if (savedHTML != null) { stageEl.innerHTML = savedHTML; savedHTML = null; }
+  });
+
+  /* ---------------- go ---------------- */
+  buildHome();
+  route();
+})();
+</script>
+</body>
+</html>
