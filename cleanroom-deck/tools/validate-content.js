@@ -11,7 +11,13 @@ const src = ["assets/data.js", "assets/data2.js"]
 const ctx = new Function(src + "\nreturn TOPICS_A.concat(TOPICS_B);");
 const topics = ctx();
 
-const KNOWN = ["intro", "points", "cards", "table", "flow", "split", "stats", "callout", "quiz", "end"];
+const KNOWN = ["intro", "points", "cards", "table", "flow", "split", "stats", "callout", "quiz", "end", "diagram"];
+
+/* the animation library has to stay in step with the content: every diagram
+   slide names a builder that exists, and no builder sits unused */
+new Function(fs.readFileSync(path.join(root, "assets", "anim.js"), "utf8"))();
+const ANIMS = new Set((globalThis.DECK_ANIM || { names: [] }).names);
+const animUsed = new Map();
 const errors = [];
 const warns = [];
 const say = (arr, msg) => arr.push(msg);
@@ -35,6 +41,16 @@ topics.forEach((t, i) => {
     const where = `${at} slide ${j + 1}`;
     totalSlides++;
     if (!KNOWN.includes(s.k)) return say(errors, `${where}: unknown layout "${s.k}"`);
+    if (s.k === "diagram") {
+      if (!s.anim) say(errors, `${where}: diagram slide has no "anim"`);
+      else if (!ANIMS.has(s.anim)) say(errors, `${where}: diagram slide names unknown animation "${s.anim}"`);
+      else animUsed.set(s.anim, (animUsed.get(s.anim) || 0) + 1);
+      if (!(s.items || []).length) say(errors, `${where}: diagram slide needs legend items`);
+      if (!(s.items || []).every((x) => Array.isArray(x) && x.length === 2))
+        say(errors, `${where}: diagram legend items must be [title, description]`);
+      if (!s.note) say(warns, `${where}: diagram slide has no takeaway note`);
+    }
+    if (s.anim && s.k !== "diagram") say(errors, `${where}: "anim" is only valid on a diagram slide`);
     if (!s.t) say(errors, `${where}: no title`);
     if (s.k === "intro") {
       if (!s.lead || !s.objectives) say(errors, `${where}: intro needs lead + objectives`);
@@ -87,6 +103,9 @@ if (new Set(ids).size !== ids.length) say(errors, `duplicate topic ids: ${ids.jo
 console.log("topics      :", topics.length);
 console.log("slides      :", totalSlides, "(" + topics.map((t) => t.slides.length).join(", ") + ")");
 console.log("words       :", words);
+console.log("diagrams    :", [...animUsed.values()].reduce((a, b) => a + b, 0), "slides using", animUsed.size, "of", ANIMS.size, "builders");
+const unused = [...ANIMS].filter((n) => !animUsed.has(n));
+if (unused.length) say(errors, `unused animation builders: ${unused.join(", ")}`);
 console.log("errors      :", errors.length);
 errors.forEach((e) => console.log("  ✗ " + e));
 console.log("warnings    :", warns.length);

@@ -51,6 +51,18 @@ const TOPICS_B = [
       note: "The last column is typical industry practice and must be justified with your own ≥12–24 months of data. Numbers are not specifications to be tuned until the data passes."
     },
     {
+      k: "diagram",
+      anim: "emtrend",
+      t: "Read the trend, not the number",
+      sub: "A dozen results plotted against your own alert and action limits",
+      items: [
+        ["One point is an event, a pattern is information", "Act on the excursion; use the trend to see whether a control is drifting."],
+        ["Identify what you grew", "Genus at minimum, species for Grade A/B and outliers, with a typed isolate bank to compare against."],
+        ["Then three documents", "A deviation, a CAPA with an effectiveness check, and an update to the CCS."]
+      ],
+      note: "Alert levels warn you before the process is out of control; action limits say it already is."
+    },
+    {
       k: "points",
       t: "Designing the sampling programme",
       ref: "Annex 1 §9.1–9.4",
@@ -218,6 +230,28 @@ const TOPICS_B = [
         ["Then — Disposition", "QA/QP decision on the batch, with rationale referencing the investigation"],
         ["60–90 d — Verify", "Effectiveness check on defined criteria; only then close and update the CCS"]
       ]
+    },
+    {
+      k: "diagram",
+      anim: "timeline",
+      t: "The shape of a good investigation",
+      sub: "Same sequence at every site: containment, evidence, reasoning, verification",
+      track: [
+        ["0 h Stop", "halt the step, freeze state"],
+        ["0–4 h Contain", "hold batch, keep samples"],
+        ["≤24 h Record", "facts, time, batch, witness"],
+        ["≤48 h Assess", "classify, scope the batches"],
+        ["≤30 d Investigate", "root cause with evidence"],
+        ["Then CAPA", "owner, date, change control"],
+        ["Then Disposition", "QA/QP decision in writing"],
+        ["60–90 d Verify", "effectiveness, then close"]
+      ],
+      items: [
+        ["Containment is not optional", "Everything after the first hour is easier if the product and the evidence were protected in minute one."],
+        ["Evidence has a shelf life", "Photographs, BMS trends, plate counts and interviews decay — capture them before the shift forgets."],
+        ["Closure needs verification", "A CAPA without an effectiveness check is a promise, not a control."]
+      ],
+      note: "The marker travels while the hold bar stays lit: the batch waits for the whole sequence, not for the paperwork."
     },
     {
       k: "cards",
@@ -389,6 +423,18 @@ const TOPICS_B = [
       note: "Adapt to your organisation chart — but the principle is fixed: production never approves its own result, and QC never reports to the manager of the product it tests."
     },
     {
+      k: "diagram",
+      anim: "handoff",
+      t: "Four reviews, one batch",
+      sub: "Each function looks at the same record through a different lens",
+      items: [
+        ["Independence makes it real", "If the person who owns the result also approves it, the review is theatre."],
+        ["Release reads the record", "EM, deviations, cycle data, lab results and the validation state — not only a certificate of analysis."],
+        ["QC does not release", "QC reports; QA and the QP decide, and both must be able to say no."]
+      ],
+      note: "The travelling chip is the batch record: nothing new is created at each stop, each stop only asks its own question."
+    },
+    {
       k: "points",
       t: "QA: the gatekeeping list",
       items: [
@@ -508,6 +554,18 @@ const TOPICS_B = [
         ["📐", "ISO & EN", "ISO 14644 series (classification, monitoring, test methods, design, operations), ISO 14698 (biocontamination), ISO 13408 (aseptic processing), ISO 11133 (media), EN 1822 (filters), ISO 21501-4 (counters)."],
         ["💊", "Pharmacopoeias", "USP/EP general chapters for sterility, endotoxins, microbial attributes, particulates and alternative methods — e.g. USP <71>, <85>, <1111>, <1223>."]
       ]
+    },
+    {
+      k: "diagram",
+      anim: "framework",
+      t: "One batch, eight points of view",
+      sub: "Different frameworks, the same product, one set of evidence",
+      items: [
+        ["Binding vs demonstrative", "Regulation says what must be true; standards and guidance show how industry proves it."],
+        ["The CCS is the join", "One documented strategy can answer Annex 1, 21 CFR 211 and an ISO clause at the same time."],
+        ["Evidence closes the gap", "A requirement nobody can trace to a record is an observation waiting to be written."]
+      ],
+      note: "Inspectors travel along the same spokes: pick a control, then ask for the design, qualification, monitoring and review behind it."
     },
     {
       k: "table",

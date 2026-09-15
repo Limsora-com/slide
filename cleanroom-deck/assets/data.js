@@ -58,6 +58,18 @@ const TOPICS_A = [
       note: "(a) Measure 5 µm where your CCS or historical trend says it is informative. (b) Grade D in-operation limits are set by the manufacturer from risk assessment and routine data. The 2022 revision aligned Grade A/B with ISO Class 5 (3 520/m³ at ≥0.5 µm) — the old 3 520 000 figure no longer applies."
     },
     {
+      k: "diagram",
+      anim: "grades",
+      t: "The distance between two numbers",
+      sub: "Airborne particles ≥0.5 µm per m³ at rest — the same scale, four different worlds",
+      items: [
+        ["Read it as orders of magnitude", "Each bar is a power of ten: Grade A holds ISO-5 air while a Grade D corridor may carry a thousand times more particles and still be compliant."],
+        ["Why the at-rest state matters", "Classification is claimed after a clean-up period; the in-operation column is what your operators have to protect."],
+        ["Grade D in operation", "No preset limit exists — the manufacturer sets it from risk assessment and routine data (Table 1, note b)."]
+      ],
+      note: "Bars are drawn to log scale, so equal steps in height mean equal factors of ten."
+    },
+    {
       k: "flow",
       t: "Zoning: the room follows the process, not the calendar",
       sub: "Clean-side to product to dirty side — flow never doubles back",
@@ -96,6 +108,18 @@ const TOPICS_A = [
         ["Materials enter sterilised", "Double-ended autoclave or depyrogenation tunnel sealed into the wall; otherwise a validated transfer-disinfection, RTS or sterilising filter."],
         ["Containment inverts the cascade", "Potent, toxic, pathogenic or radioactive work may need negative pressure and dedicated air; the incoming air must then be of the same or higher grade."]
       ]
+    },
+    {
+      k: "diagram",
+      anim: "cascade",
+      t: "Why 10 Pa is not decoration",
+      sub: "Air travels from high to low pressure — the cascade turns that physics into protection",
+      items: [
+        ["Direction beats magnitude", "A difference you cannot measure, record and alarm is not a control, however large it is."],
+        ["When a door opens", "Air leaves the clean area while the door is cracked, and the room returns to grade inside the qualified clean-up period."],
+        ["Containment flips it", "For potent, toxic or pathogenic work the cascade may run inward — then the incoming air must be of the same or higher grade."]
+      ],
+      note: "Values shown are guidance values from Annex 1 §4.14; your set points come from the CCS and from the qualification result."
     },
     {
       k: "split",
@@ -283,6 +307,18 @@ const TOPICS_A = [
       }
     },
     {
+      k: "diagram",
+      anim: "aps",
+      t: "Media fill, in slow motion",
+      sub: "What an aseptic process simulation shows you that no other test can",
+      items: [
+        ["Rehearse the worst case", "Maximum operators, every defined intervention, and a run long enough to cover a real campaign."],
+        ["One unit is a failure", "Any growth means the simulation failed: investigate, correct, then three consecutive successful runs."],
+        ["It is a people test", "Gowning, behaviour, first-air discipline and barrier technique all appear in the result."]
+      ],
+      note: "Incubate at both 20–25 °C and 30–35 °C; a false negative costs far more than a false alarm."
+    },
+    {
       k: "points",
       t: "Cleaning validation and computerised systems",
       items: [
@@ -380,6 +416,18 @@ const TOPICS_A = [
         ["Enter", "Mirror check, no contact with surfaces, enter without touching the frame, avoid disturbing first air"]
       ],
       note: "Leave-by-a-different-route or time-separated egress is preferred where the CCS shows high risk; doffing is the reverse order, in the correct room, without re-contaminating the corridor."
+    },
+    {
+      k: "diagram",
+      anim: "gown",
+      t: "Every layer is a barrier",
+      sub: "Watch the shedding stop as the gown goes on",
+      items: [
+        ["Sequence is the control", "The order is validated so a clean outer layer never touches a contaminated inner one — and egress reverses it."],
+        ["Qualification is per person", "Qualified before access, requalified at least every 6 months, with gloved fingertip sampling during operations."],
+        ["Behaviour finishes the job", "Gowning protects the product from the person; conduct protects it afterwards."]
+      ],
+      note: "The particle cloud is the point: garments do not make a person clean, they contain the person."
     },
     {
       k: "cards",
@@ -591,6 +639,18 @@ const TOPICS_A = [
       note: "Validation is performed on the actual surface material, with a test organism set including spore formers, and must demonstrate at least a 2-log (MEM 100) reduction for antimicrobial products and 4-log (MEM 10 000) for non-antimicrobial products, using neutralising media to avoid false success."
     },
     {
+      k: "diagram",
+      anim: "logred",
+      t: "What “disinfected” has to mean",
+      sub: "Log reduction demonstrated on your surfaces, with your contact time",
+      items: [
+        ["Clean first", "Disinfectant on a soiled surface is mostly wasted, and residues can inhibit the agent that follows."],
+        ["Two modes of action", "Bacteria and fungi are not defeated the same way; keep a sporicidal on a defined schedule."],
+        ["Then verify", "Validation on the actual material, in-use expiry, and EM trends that would reveal a tolerant flora."]
+      ],
+      note: "MEM convention: about a 4-log reduction for non-antimicrobial products, 2-log where the product itself is antimicrobial."
+    },
+    {
       k: "points",
       t: "Harbourage, resistance and back-flow",
       items: [
@@ -689,6 +749,18 @@ const TOPICS_A = [
       ref: "Annex 1 §4.14 · §4.16 · §4.30"
     },
     {
+      k: "diagram",
+      anim: "udaf",
+      t: "First air, explained",
+      sub: "What unidirectional airflow protects, and how a hand destroys it in one second",
+      items: [
+        ["Sweep, do not stir", "0.36–0.54 m/s of filtered air moves over and away from exposed product; turbulent air only moves contamination around."],
+        ["Nothing above the line", "An arm, a tool or a glove between the filter and the fill point puts a shadow there — particles land in it, not on your hand."],
+        ["Prove it with smoke", "Airflow visualisation at rest and in operation, with the video retained, is what shows the pattern you claim."]
+      ],
+      note: "This is also why aseptic interventions are limited, planned and rehearsed in media fill."
+    },
+    {
       k: "flow",
       t: "The air path",
       sub: "Read it left to right and ask, at each stage, what happens if this component fails",
@@ -704,6 +776,18 @@ const TOPICS_A = [
       note: "Fresh-air rate must cover room pressurisation losses, occupancy and any exhaust demand; system restart after a trip needs a validated recovery time before personnel and product return."
     },
     {
+      k: "diagram",
+      anim: "ahu",
+      t: "The air path, control by control",
+      sub: "Every stage protects the next one; only the last is trusted with your product",
+      items: [
+        ["A chain, not a filter", "A bypassed gasket or a saturated bag filter hands the whole load to the terminal HEPA — and it will not tell you."],
+        ["Test the barrier", "Classification plus filter integrity scanning converts “a HEPA is installed” into “the air is clean”."],
+        ["Design the failure", "Fan trip, low ΔP and loss of humidification need alarms, plus a recovery route before work resumes."]
+      ],
+      note: "Integrity acceptance is a leak test, not a certificate: ≤0.01 % local and ≤0.005 % average penetration."
+    },
+    {
       k: "stats",
       t: "Design and acceptance numbers",
       ref: "Annex 1 §4.30 · EN 1822 · ISO 14644-3",
@@ -713,6 +797,18 @@ const TOPICS_A = [
         ["60–90 / 20–40", "Typical ACH, Grade A–B vs Grade C–D", "Set by classification, recovery and NUDAF design (0.25–0.5 m/s duct guidance)"],
         ["<20 min", "Clean-up period to reach at-rest grade after operations", "Guidance value in §4.29; determined during qualification"]
       ]
+    },
+    {
+      k: "diagram",
+      anim: "recovery",
+      t: "Recovery is a measured number",
+      sub: "How fast a room flushes itself decides what every interruption costs",
+      items: [
+        ["100:1", "A qualified room clears a challenge of a hundred times its own limit — the test that proves the air changes are working."],
+        ["Clean-up guidance <20 min", "The at-rest state is claimed after a clean-up period determined during qualification (Annex 1 §4.29), not hoped for."],
+        ["Recalculate after change", "Filter replacement, set-point moves, blocked returns or a lost air supply restart the clock and the risk assessment."]
+      ],
+      note: "Recovery is what makes a short stop survivable: a 20-minute outage is only a deviation if the room cannot prove its return."
     },
     {
       k: "cards",

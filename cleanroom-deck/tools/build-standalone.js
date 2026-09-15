@@ -15,16 +15,19 @@ html = html.replace(
   "<style>\n" + read("assets/styles.css") + "\n</style>"
 );
 
-// swap the three script tags for their contents (order matters)
+// swap the four script tags for their contents (order matters: content, then
+// the animation library, then the app that uses both)
 html = html.replace(
-  /<script src="assets\/data\.js"><\/script>\s*<script src="assets\/data2\.js"><\/script>\s*<script src="assets\/app\.js"><\/script>/,
+  /<script src="assets\/data\.js"><\/script>\s*<script src="assets\/data2\.js"><\/script>\s*<script src="assets\/anim\.js"><\/script>\s*<script src="assets\/app\.js"><\/script>/,
   "<script>\n" +
   read("assets/data.js") + "\n" +
   read("assets/data2.js") + "\n" +
+  read("assets/anim.js") + "\n" +
   read("assets/app.js") + "\n</script>"
 );
 
-const leftovers = html.match(/<script src=|assets\//g);
+/* nothing may still point at a sibling file: the single file must stand alone */
+const leftovers = html.match(/<script[^>]*\ssrc=|<(link|img)[^>]*="(\.\/)?assets\//g);
 if (leftovers) {
   console.error("✗ standalone build did not inline everything:", leftovers);
   process.exit(1);

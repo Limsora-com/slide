@@ -3,7 +3,7 @@
 A click-through training deck with a **main topic menu**. Pick a topic on the home
 screen, click it, and you enter that topic's slides.
 
-![topics](https://img.shields.io/badge/topics-9-blue) ![slides](https://img.shields.io/badge/slides-86-green) ![deps](https://img.shields.io/badge/dependencies-none-lightgrey)
+![topics](https://img.shields.io/badge/topics-9-blue) ![slides](https://img.shields.io/badge/slides-98-green) ![diagrams](https://img.shields.io/badge/animated%20diagrams-12-blueviolet) ![deps](https://img.shields.io/badge/dependencies-none-lightgrey)
 
 | # | Topic | What it covers |
 |---|-------|----------------|
@@ -20,6 +20,34 @@ screen, click it, and you enter that topic's slides.
 Every topic ends with a 3-question **knowledge check** (self-marking, score kept in the
 browser) and a **takeaways** slide.
 
+## The white theme and the explanations
+
+The deck is light-on-purpose: white cards on a pale blue-grey page, one dark ink for text, and a
+per-topic accent that is *derived*, not chosen — `accentTokens()` in `assets/app.js` darkens each
+topic accent until it passes 4.5:1 on white, and the whole deck paints with that derived ink.
+`tools/check-styles.js` asserts the contrast of every text pair, so a recolour that becomes
+unreadable fails the build instead of shipping.
+
+Twelve slides are **animated diagrams** (`assets/anim.js`): grade scales drawn to log height, a
+pressure cascade with a door that leaks, first air blocked by a hand, gowning layers containing a
+shedding cloud, HEPA stages catching particles, a media-fill tray turning turbid, an EM trend
+crossing an action limit, a deviation clock with the batch on hold, log-reduction bars, a QA/QC
+handoff, the framework wheel and the clean-up curve. The point is not decoration — each one shows
+*a mechanism* that the words on the slide only assert.
+
+They are plain SVG + CSS, with no library and no timers:
+
+* elements carry an index (`--i`) and the figure carries a step length (`--slot`, 1.5 s), so the
+  build sequence is arithmetic in CSS rather than JavaScript;
+* every loop is gated on `.slide.play`, which the renderer adds to the visible slide only — off
+  screen nothing animates, so the presenter never watches a private animation;
+* `R` or the ↻ control replays the current slide's build from zero (`.play` is dropped, the node
+  is forced to reflow, then re-added);
+* `prefers-reduced-motion` and `@media print` disable the animation and force the *finished*
+  state, so a printed deck and a reduced-motion viewer get a complete, legible figure;
+* headline numbers on stat slides count up on arrival (`countUp()`), landing on the exact value
+  from the content, never a rounded stub.
+
 ## Run it
 
 No build, no server, no dependencies:
@@ -34,9 +62,9 @@ open cleanroom-deck/index.html     # or double-click it — works straight from 
 
 * **Present everything in one flow:** *Present all topics in sequence* (or `#/all/0`).
 * **Shareable single file:** `node tools/build-standalone.js` → `cleanroom-gmp-deck.html`
-  (CSS + JS + content inlined, still opens from `file://`).
+  (CSS + JS + content + the animation library inlined, still opens from `file://`).
 * **PDF:** `P` in a topic prints that topic as one slide per page; the button on the menu
-  prints the whole 86-slide deck. A4 landscape.
+  prints the whole 98-slide deck. A4 landscape.
 
 ### Keys
 
@@ -48,6 +76,7 @@ open cleanroom-deck/index.html     # or double-click it — works straight from 
 | `Esc` | back to the topic menu | | `A` | auto-advance 15 s / 30 s |
 | `1`–`9` | jump straight into a topic | | `T` | presenter timer |
 | `S` | search the menu | | `C` | force compact type |
+| `R` | replay this slide's animation | | | |
 | `?` | shortcuts | | | |
 
 Progress, completion ticks and quiz scores are stored in `localStorage`, and every slide is
@@ -72,11 +101,19 @@ Slides are data, not markup. All wording lives in `assets/data.js` (topics 1–5
     { k: "split",  t, left: { h, tone: "good", items: [] }, right: { h, tone: "bad", items: [] } },
     { k: "stats",  t, items: [["0.36–0.54 m/s", "Label", "small print"]] },
     { k: "callout", t, quote, points: [] },
+    { k: "diagram", t, sub, anim: "udaf", items: [["Legend heading", "Why it matters"]], note },
     { k: "quiz",   t, questions: [{ q, opts: [], a: 0, why }] },
     { k: "end",    t, items: [] }
   ]
 }
 ```
+
+`k: "diagram"` pulls its drawing from `window.DECK_ANIM` (`assets/anim.js`): `anim` names the
+builder, `items` become the legend under the figure, and the builder's own caption explains the
+mechanism. The `timeline` builder also reads a `track: [["label", "detail"]]` array. Adding a
+diagram means writing one builder and pointing a slide at it — `validate-content.js` fails if a
+slide names a builder that does not exist, and also fails if a builder is never used, so the two
+lists cannot drift.
 
 `assets/app.js` renders whatever it finds — add a slide object and it appears in the deck,
 the progress dots, the overview and the print output automatically. Slides auto-shrink when
@@ -86,10 +123,16 @@ they would not fit the screen.
 
 ```bash
 node tools/validate-content.js   # schema, table column counts, quiz answer indexes, dupes
+node tools/check-styles.js       # keyframes, CSS variables, contrast, diagram geometry
 ```
 
-It exits non-zero on anything that would render a broken slide, and warns on strings long
-enough to crowd a slide.
+Both exit non-zero on anything that would render a broken or unreadable slide. `check-styles.js`
+is the stricter of the two: it re-reads the palette out of `styles.css`, runs every diagram
+builder with the *real* words from the content, and measures each text run against the box it is
+drawn on — so an animation that spills off its canvas, a label wider than its own card, an accent
+too pale for white, or an `animation:` name with no `@keyframes` block all fail the check. The
+builder helpers (`clip()`, `lines()`) use the same width estimate as the checker on purpose: what
+is measured to fit here cannot be measured to overflow there.
 
 ## Sources behind the content
 
@@ -111,7 +154,9 @@ cleanroom-deck/
   assets/styles.css           theme, slide layouts, print and compact styles
   assets/data.js  data2.js     all slide content (edit here)
   assets/app.js               renderer, navigation, quiz, progress, routing
+  assets/anim.js              the 12 explanatory diagrams (SVG + CSS, no dependencies)
   tools/validate-content.js   content schema + consistency checks
+  tools/check-styles.js       contrast, keyframes and diagram geometry checks
   tools/build-standalone.js   one-file export for sharing
 
 ../index.html                 earlier single-file deck on main (untouched by this folder)

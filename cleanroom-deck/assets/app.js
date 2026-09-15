@@ -17,6 +17,38 @@
   function esc(v) { return String(v == null ? "" : v).replace(/[&<>"]/g, function (c) { return ESC_MAP[c]; }); }
   function join(arr, sep) { return (arr || []).join(sep || " "); }
 
+  /* ---- colour helpers: bright topic accents read badly on white, so each
+     accent gets a darkened "ink" twin (text/icons) and soft tint/line ---- */
+  function hex2rgb(h) {
+    h = String(h || "").replace("#", "");
+    if (h.length === 3) h = h.split("").map(function (c) { return c + c; }).join("");
+    var n = parseInt(h, 16);
+    return isNaN(n) ? [10, 162, 216] : [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+  }
+  function chan(v) { v = v / 255; return v <= .04045 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }
+  function luminance(rgb) { return .2126 * chan(rgb[0]) + .7152 * chan(rgb[1]) + .0722 * chan(rgb[2]); }
+  function contrast(a, b) { var l1 = luminance(a), l2 = luminance(b); return (Math.max(l1, l2) + .05) / (Math.min(l1, l2) + .05); }
+  function accentTokens(hex) {
+    var r = hex2rgb(hex), navy = [12, 34, 51];
+    var ink = r.map(function (v, i) { return Math.round(v * .45 + navy[i] * .55); });
+    /* keep nudging toward navy until the text is comfortably readable on white */
+    var softBg = r.map(function (v, i) { return Math.round(v * .1 + 255 * .9); }); /* --accent-soft on white */
+    for (var k = 0; k < 8 && (contrast(ink, [255, 255, 255]) < 4.6 || contrast(ink, softBg) < 4.6); k++) {
+      ink = ink.map(function (v, i) { return Math.round(v * .85 + navy[i] * .15); });
+    }
+    return {
+      base: hex,
+      ink: "rgb(" + ink.join(",") + ")",
+      soft: "rgba(" + r.join(",") + ",.10)",
+      line: "rgba(" + r.join(",") + ",.34)",
+      ratio: +contrast(ink, [255, 255, 255]).toFixed(2)
+    };
+  }
+  function styleFor(hex) {
+    var t = accentTokens(hex);
+    return "--accent:" + t.base + ";--accent-ink:" + t.ink + ";--accent-soft:" + t.soft + ";--accent-line:" + t.line;
+  }
+
   /* ------------------------------- storage ------------------------------ */
   function load() {
     try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; }
@@ -52,7 +84,8 @@
       var n = Math.min(70, Math.round(w * h / 32000));
       dots = [];
       for (var i = 0; i < n; i++) {
-        dots.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.9 + .4, vy: -(Math.random() * .22 + .05), vx: (Math.random() - .5) * .12, a: Math.random() * .5 + .12 });
+        /* downward drift, like the filtered air in a cleanroom */
+        dots.push({ x: Math.random() * w, y: Math.random() * h, r: Math.random() * 1.7 + .4, vy: Math.random() * .24 + .06, vx: (Math.random() - .5) * .1, a: Math.random() * .2 + .05 });
       }
     }
     function frame() {
@@ -60,10 +93,10 @@
       for (var i = 0; i < dots.length; i++) {
         var d = dots[i];
         d.y += d.vy; d.x += d.vx;
-        if (d.y < -10) { d.y = h + 10; d.x = Math.random() * w; }
+        if (d.y > h + 10) { d.y = -10; d.x = Math.random() * w; }
         if (d.x < -10) d.x = w + 10; if (d.x > w + 10) d.x = -10;
         ctx.beginPath();
-        ctx.fillStyle = "rgba(120,210,255," + d.a + ")";
+        ctx.fillStyle = "rgba(70,150,200," + d.a + ")";
         ctx.arc(d.x, d.y, d.r, 0, 6.283); ctx.fill();
       }
       if (!reduce) requestAnimationFrame(frame);
@@ -120,8 +153,9 @@
           }).join("") + "</tr>";
         }).join("") + "</tbody></table></div>" + (s.note ? '<p class="note">' + esc(s.note) + "</p>" : "");
     } else if (k === "flow") {
-      body = '<ol class="flow ' + ((s.steps || []).length > 5 ? "many" : "") + '">' + (s.steps || []).map(function (st, i) {
-        return '<li><span class="fnum">' + (i + 1) + "</span><div><b>" + esc(st[0]) + "</b><span>" + esc(st[1]) + "</span></div></li>";
+      var nSteps = (s.steps || []).length;
+      body = '<ol class="flow ' + (nSteps > 5 ? "many" : "") + '" style="--n:' + nSteps + ";--slot:" + SLOT + 's">' + (s.steps || []).map(function (st, i) {
+        return '<li style="--i:' + i + '"><span class="fnum">' + (i + 1) + "</span><div><b>" + esc(st[0]) + "</b><span>" + esc(st[1]) + "</span></div></li>";
       }).join("") + "</ol>" + (s.note ? '<p class="note">' + esc(s.note) + "</p>" : "");
     } else if (k === "split") {
       body = '<div class="split">' + panel(s.left) + panel(s.right) + "</div>" + (s.note ? '<p class="note">' + esc(s.note) + "</p>" : "");
@@ -133,6 +167,10 @@
     } else if (k === "callout") {
       body = '<blockquote class="quote">“' + esc(s.quote) + '”</blockquote>' +
         (s.points ? listItems(s.points, "col-2 tight") : "") + (s.note ? '<p class="note">' + esc(s.note) + "</p>" : "");
+    } else if (k === "diagram") {
+      var fig = window.DECK_ANIM ? window.DECK_ANIM.build(s.anim, s, topic, esc) : "";
+      body = fig + (s.items ? listItems(s.items, "legend col-" + Math.min(3, s.items.length)) : "") +
+        (s.note ? '<p class="note">' + esc(s.note) + "</p>" : "");
     } else if (k === "quiz") {
       body = '<div class="quiz" data-topic="' + esc(topic && topic.id) + '">' + (s.questions || []).map(function (q, qi) {
         return '<div class="q" data-q="' + qi + '"><h4><span>' + (qi + 1) + ".</span> " + esc(q.q) + "</h4><div class=\"opts\">" +
@@ -164,8 +202,12 @@
       (p.items || []).map(function (it) { return "<li>" + esc(it) + "</li>"; }).join("") + "</ul></section>";
   }
 
+  var SLOT = (window.DECK_ANIM && window.DECK_ANIM.slot) || 1.5;
+
   function wrap(s, topic, gi, total, body, cls) {
-    return '<article class="slide ' + cls + '" data-gi="' + gi + '" style="--accent:' + (topic ? topic.accent : "#00d4ff") + '">' +
+    var slot = (window.DECK_ANIM && window.DECK_ANIM.slot) || SLOT;
+    return '<article class="slide ' + cls + '" data-gi="' + gi + '" style="' + styleFor(topic ? topic.accent : "#00d4ff") +
+      ";--slot:" + slot + 's;--n:' + ((s.steps && s.steps.length) || (s.items && s.items.length) || 4) + '">' +
       '<div class="s-body">' + body + "</div>" +
       '<div class="s-foot"><span>' + (topic ? esc(topic.title) : "") + "</span><span>" + (gi + 1) + " / " + total + "</span></div>" +
       "</article>";
@@ -193,7 +235,7 @@
     grid.innerHTML = TOPICS.map(function (t) {
       var score = store.scores[t.id];
       var visited = store.visited[t.id];
-      return '<button class="topic-card" data-open="' + t.id + '" style="--accent:' + t.accent + '">' +
+      return '<button class="topic-card" data-open="' + t.id + '" style="' + styleFor(t.accent) + '">' +
         '<span class="tc-num">' + String(t.n).padStart(2, "0") + "</span>" +
         (store.done[t.id] ? '<span class="tc-done" title="Completed">✓</span>' : "") +
         '<span class="tc-icon">' + t.icon + "</span>" +
@@ -208,6 +250,8 @@
     $("#progText").innerHTML = "<b>" + done + "</b> of " + total + " topics completed";
     $("#progBar").style.width = (done / total * 100) + "%";
     $("#totalSlides").textContent = TOPICS.reduce(function (a, t) { return a + t.slides.length; }, 0);
+    var dg = $("#diagramCount");
+    if (dg) dg.textContent = TOPICS.reduce(function (n, t) { return n + t.slides.filter(function (s) { return s.k === "diagram"; }).length; }, 0);
     $("#topicCount").textContent = total;
   }
 
@@ -242,7 +286,7 @@
 
     $("#deckTitle").textContent = state.deckTitle;
     $("#deckCount").textContent = total + " slides";
-    $("#deckAccent").style.setProperty("--accent", state.homeTopicId ? first.accent : "#00d4ff");
+    $("#deckAccent").setAttribute("style", styleFor(state.homeTopicId ? first.accent : "#00d4ff"));
     $("#stage").innerHTML = state.deck.map(function (d, i) {
       return renderSlide(d.slide, d.topic, i, total);
     }).join("");
@@ -262,9 +306,11 @@
     var slides = $$("#stage .slide");
     slides.forEach(function (s, idx) {
       s.classList.toggle("active", idx === i);
+      s.classList.remove("play");
       if (idx === i) { s.classList.remove("in"); void s.offsetWidth; s.classList.add("in"); }
     });
     fit(slides[i]);
+    play(slides[i]);
     var d = state.deck[i];
     var t = d.topic;
     $("#crumb").innerHTML = '<button data-act="menu">Topics</button><span>/</span>' +
@@ -283,6 +329,42 @@
     if (!silent) save(store);
     applyQuiz(d);
     setAuto();
+  }
+
+  function reduced() {
+    try { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+    catch (e) { return false; }
+  }
+
+  /* Restart the CSS build animations and count the headline numbers up.
+     Re-adding .play is what makes every diagram replay from zero. */
+  function play(slide) {
+    if (!slide || reduced()) return;
+    void slide.offsetWidth;
+    slide.classList.add("play");
+    countUp(slide);
+  }
+  function countUp(slide) {
+    if (!slide) return;
+    $$(".stat .sv", slide).forEach(function (el, i) {
+      var full = el.getAttribute("data-full") || el.textContent.trim();
+      el.setAttribute("data-full", full);
+      var m = full.match(/^([^\d]*)(\d+(?:\.\d+)?)(.*)$/);
+      if (!m || reduced()) { el.textContent = full; return; }
+      var target = parseFloat(m[2]);
+      if (!isFinite(target)) { el.textContent = full; return; }
+      var dec = (m[2].split(".")[1] || "").length;
+      var t0 = 0, dur = 620 + i * 130;
+      function step(t) {
+        if (!t0) t0 = t;
+        var p = Math.min(1, (t - t0) / dur);
+        var e = 1 - Math.pow(1 - p, 3);
+        el.textContent = m[1] + (target * e).toFixed(dec) + m[3];
+        if (p < 1 && el.isConnected !== false) requestAnimationFrame(step);
+        else el.textContent = full;
+      }
+      requestAnimationFrame(step);
+    });
   }
 
   /* Shrink the type one step if a slide would not fit the viewport, so a
@@ -367,7 +449,7 @@
         ["Esc", "Back to the topic menu"], ["G", "Slide overview (this panel)"], ["F", "Fullscreen (best for presenting)"],
         ["T", "Presenter timer on / off"], ["P", "Print or save as PDF"], ["1 – 9", "Open a topic directly"],
         ["A", "Auto-advance: off / 15 s / 30 s"], ["C", "Force compact type (slides auto-fit anyway)"],
-        ["S", "Search topics (on the menu)"], ["?", "This help"]].map(function (r) {
+        ["R", "Replay the animation on this slide"], ["S", "Search topics (on the menu)"], ["?", "This help"]].map(function (r) {
           return "<tr><td><kbd>" + esc(r[0]) + "</kbd></td><td>" + esc(r[1]) + "</td></tr>";
         }).join("") + "</tbody></table>" +
         '<p class="ov-note">Swipe left / right on touch devices. Every view is linkable: <code>#/design/3</code> opens the design topic at slide 4.</p></div>';
@@ -478,6 +560,10 @@
       }
       else if (a === "timer") toggleTimer();
       else if (a === "auto") { state.auto = state.auto === 0 ? 15 : state.auto === 15 ? 30 : 0; setAuto(); }
+      else if (a === "replay") {
+        var sl = $$("#stage .slide")[state.i];
+        if (sl) { sl.classList.remove("play"); countUp(sl); requestAnimationFrame(function () { if (!reduced()) sl.classList.add("play"); }); }
+      }
       else if (a === "dense") {
         state.force = !state.force;
         act.classList.toggle("on", state.force);
@@ -535,6 +621,10 @@
           state.force = !state.force;
           var db = $("[data-act='dense']"); if (db) db.classList.toggle("on", state.force);
           fit($$("#stage .slide")[state.i]);
+          break;
+        case "r": case "R":
+          var cur = $$("#stage .slide")[state.i];
+          if (cur) { cur.classList.remove("play"); countUp(cur); requestAnimationFrame(function () { if (!reduced()) cur.classList.add("play"); }); }
           break;
         case "?": openOverlay("help"); break;
       }
