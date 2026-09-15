@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cleanroom &amp; GMP Training — Interactive Deck</title>
+<meta name="description" content="Interactive GMP training deck: cleanroom design, qualification &amp; validation, gowning, contamination control, HVAC, environmental monitoring, deviations, QA/QC and regulatory requirements.">
+<meta name="theme-color" content="#0a1628">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%230a1628'/><text y='72' x='50' font-size='58' text-anchor='middle'>🏭</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles.css">
+</head>
+<body data-view="home">
+
+<canvas id="fx" aria-hidden="true"></canvas>
+
+<!-- ============================== HOME / MENU ============================== -->
+<main id="home" class="view">
+
+  <section class="hero">
+    <div class="hero-badge"><i></i>Interactive GMP training deck</div>
+    <h1>Cleanrooms &amp; Sterile Manufacturing</h1>
+    <p class="hero-sub">
+      Pick a topic to enter its slides — <b id="topicCount">9</b> topics,
+      <b id="totalSlides">—</b> slides, quizzes and a print-ready PDF export.
+      Built on <b>EU GMP Annex&nbsp;1 (2022)</b>, <b>ISO&nbsp;14644</b> and <b>21&nbsp;CFR&nbsp;211</b>.
+    </p>
+    <div class="hero-chips">
+      <span>Design &amp; grades</span><span>Qualification</span><span>Gowning</span>
+      <span>Contamination control</span><span>HVAC</span><span>EM</span>
+      <span>Deviations</span><span>QA / QC</span><span>Regulatory</span>
+    </div>
+    <div class="hero-actions">
+      <button class="btn primary" data-act="all">▶ Present all topics in sequence</button>
+      <button class="btn" data-act="print-all">⤓ Print / save PDF (full deck)</button>
+      <button class="btn ghost" data-act="help">⌨ Shortcuts</button>
+    </div>
+  </section>
+
+  <section class="toolbar">
+    <input id="search" type="search" placeholder="Search a topic — try “gowning”, “HEPA”, “media fill”, “CAPA”…" aria-label="Search topics">
+    <span id="searchInfo" aria-live="polite"></span>
+    <div class="progress-wrap">
+      <span id="progText"><b>0</b> of 9 topics completed</span>
+      <div class="prog" aria-hidden="true"><i id="progBar"></i></div>
+    </div>
+    <button class="btn ghost sm" data-act="reset">Reset progress</button>
+  </section>
+
+  <!-- topic cards are rendered here by app.js -->
+  <section id="menuGrid" class="menu-grid" aria-label="Topics"></section>
+
+  <footer class="foot">
+    <span><b>Training material.</b> Regulatory text quoted from EU GMP Annex 1 (2022), Annex 11, Annex 15, ISO 14644 and 21 CFR 210/211 — always verify against the current official version and your own SOPs.</span>
+    <span>Use ← → to navigate · <kbd>F</kbd> fullscreen · <kbd>P</kbd> PDF</span>
+  </footer>
+</main>
+
+<!-- ================================= DECK ================================= -->
+<main id="deck" class="view">
+
+  <header class="deck-head" id="deckAccent">
+    <button class="btn ghost sm" data-act="menu">← Topics</button>
+    <div class="dh-mid">
+      <span id="crumb"></span>
+      <h3 id="deckTitle">—</h3>
+      <span id="deckCount"></span>
+    </div>
+    <div class="dh-actions">
+      <span id="timer" aria-hidden="true">00:00</span>
+      <span id="deckIdx">1 / 1</span>
+      <button class="icon-btn" data-act="ov" title="Slide overview (G)" aria-label="Slide overview">▦</button>
+      <button class="btn ghost sm" id="btnAuto" data-act="auto" title="Auto-advance (A)">Auto: off</button>
+      <button class="icon-btn" data-act="timer" title="Presenter timer (T)" aria-label="Presenter timer">⏱</button>
+      <button class="icon-btn" data-act="dense" title="Force compact type (slides auto-fit by default)" aria-label="Compact type">Aa</button>
+      <button class="icon-btn" data-act="full" title="Fullscreen (F)" aria-label="Fullscreen">⛶</button>
+      <button class="icon-btn" data-act="print" title="Print / PDF of this topic (P)" aria-label="Print">⎙</button>
+      <button class="icon-btn" data-act="help" title="Keyboard shortcuts (?)" aria-label="Help">?</button>
+    </div>
+  </header>
+
+  <div class="progress-track"><i id="autoFill"></i><i id="progFill"></i></div>
+
+  <div id="stage" class="stage" role="region" aria-live="polite" aria-label="Slides"></div>
+
+  <footer class="deck-foot">
+    <button class="btn sm" id="btnPrev" data-act="prev">← Prev</button>
+    <div id="dots" aria-hidden="true"></div>
+    <span class="hint"><kbd>←</kbd> <kbd>→</kbd> or <kbd>space</kbd> · <kbd>G</kbd> overview · <kbd>Esc</kbd> menu</span>
+    <button class="btn primary sm" id="btnNext" data-act="next">Next →</button>
+  </footer>
+</main>
+
+<div id="overlay" class="overlay" role="dialog" aria-modal="true" aria-label="Overview"></div>
+
+<script src="assets/data.js"></script>
+<script src="assets/data2.js"></script>
+<script src="assets/app.js"></script>
+</body>
+</html>
